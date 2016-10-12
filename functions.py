@@ -167,8 +167,8 @@ def corner_detector(image, imageRGB):
 	return imageRGB
 
 def componentCoords(image,indicatedLocation):
-	# Cropping out a window around the indicated component
-	sample = image[indicatedLocation[0]-4:indicatedLocation[0]+4,indicatedLocation[1]-4:indicatedLocation[1]+4]
+	# Cropping out a window around the indicated component to find its colour
+	sample = image[indicatedLocation[0]-5:indicatedLocation[0]+5,indicatedLocation[1]-5:indicatedLocation[1]+5]
 	greenAvg = np.mean(sample[:,:,0])
 	blueAvg = np.mean(sample[:,:,1])
 	redAvg = np.mean(sample[:,:,2])
@@ -198,7 +198,7 @@ def componentCoords(image,indicatedLocation):
 	centreX = sumX/total
 	centreY = sumY/total
 
-	return centreX, centreY, bottomestX, bottomestY
+	return centreX, centreY, bottomestX, bottomestY, notSameColour, visited
 	
 def traverseOut(image,i,j,sampleColour,visited, notSameColour, sumX, sumY, total):
 	tolerance = 0.2
