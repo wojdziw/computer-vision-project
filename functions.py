@@ -182,7 +182,7 @@ def componentCoords(image,indicatedLocation):
 	sumX = 0
 	sumY = 0
 	total = 0.0
-	_, notSameColour, sumX, sumY, total = traverseOut(image, indicatedLocation[0], indicatedLocation[1], sampleColour, visited, notSameColour, sumX, sumY, total)
+	visited, notSameColour, sumX, sumY, total = traverseOut(image, indicatedLocation[0], indicatedLocation[1], sampleColour, visited, notSameColour, sumX, sumY, total)
 
 	bottomestX = 0
 	bottomestY = 0
