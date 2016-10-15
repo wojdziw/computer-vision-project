@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import Queue
 
 def MyConvolve(image, ff):
 	result = np.zeros(image.shape)
@@ -166,23 +167,129 @@ def corner_detector(image, imageRGB):
 
 	return imageRGB
 
-def componentCoords(image,indicatedLocation):
-	# Cropping out a window around the indicated component to find its colour
+def patchColour(image,indicatedLocation):
+	# Cropping out a window around the indicated component to find its colour	
 	sample = image[indicatedLocation[0]-5:indicatedLocation[0]+5,indicatedLocation[1]-5:indicatedLocation[1]+5]
 	greenAvg = np.mean(sample[:,:,0])
 	blueAvg = np.mean(sample[:,:,1])
 	redAvg = np.mean(sample[:,:,2])
-	# finding the average colour of the component
-	sampleColour = [greenAvg,blueAvg,redAvg]
 
-	# traversing
+	return [greenAvg,blueAvg,redAvg]
+
+def colourDistance(colour1,colour2):
+	return np.linalg.norm([colour1[0]-colour2[0], colour1[1]-colour2[1], colour1[2]-colour2[2]])
+
+def componentCoords(image,indicatedLocation,previousColour):
+	# Finding the average colour of the component
+	sampleColour = patchColour(image,indicatedLocation)
+	a = indicatedLocation
+
+	# Checking how far the previous colour patch and the new one is
+	sampleColourNorm = np.linalg.norm(sampleColour)
+	previousColourNorm = np.linalg.norm(previousColour)
+
+	# Calculating different measures of how different the previous and current colour patches are
+	normDifference = int(100*np.abs(previousColourNorm-sampleColourNorm)/previousColourNorm)
+	colourDistance = np.linalg.norm([sampleColour[0]-previousColour[0], sampleColour[1]-previousColour[1], sampleColour[2]-previousColour[2]])
+
+	print("normDifference: " + str(normDifference)+"%")
+	print("colour distance: " + str(colourDistance))
+
+	# CORRECTING THE COMPONENT CENTRAL LOCATION
+
+	# If the colour patches are very different - start looking for a new starting point
+	# Trying to find the point in the neighborhood that is more similar to the previous patch
+	threshold = 20
+
+	# SOMETIMES THESE DIRECTIONS AREN'T ENOUGH!!!!
+	if colourDistance > threshold:
+		print("Colour distance bad")
+		for i in range(1,10):
+
+			nPatch = [indicatedLocation[0]-2*i,indicatedLocation[1]]
+			nePatch = [indicatedLocation[0]-2*i,indicatedLocation[1]+2*i]
+			ePatch = [indicatedLocation[0],indicatedLocation[1]+2*i]
+			sePatch = [indicatedLocation[0]+2*i,indicatedLocation[1]+2*i]
+			sPatch = [indicatedLocation[0]+2*i,indicatedLocation[1]]
+			swPatch = [indicatedLocation[0]+2*i,indicatedLocation[1]-2*i]
+			wPatch = [indicatedLocation[0],indicatedLocation[1]-2*i]
+			nwPatch = [indicatedLocation[0]-2*i,indicatedLocation[1]-2*i]
+
+			nPatchColour = patchColour(image, nPatch)
+			nePatchColour = patchColour(image, nePatch)
+			ePatchColour = patchColour(image, ePatch)
+			sePatchColour = patchColour(image, sePatch)
+			sPatchColour = patchColour(image, sPatch)
+			swPatchColour = patchColour(image, swPatch)
+			wPatchColour = patchColour(image, wPatch)
+			nwPatchColour = patchColour(image, nwPatch)
+
+			nColourDistance = np.linalg.norm([nPatchColour[0]-previousColour[0], nPatchColour[1]-previousColour[1], nPatchColour[2]-previousColour[2]])
+			neColourDistance = np.linalg.norm([nePatchColour[0]-previousColour[0], nePatchColour[1]-previousColour[1], nePatchColour[2]-previousColour[2]])
+			eColourDistance = np.linalg.norm([ePatchColour[0]-previousColour[0], ePatchColour[1]-previousColour[1], ePatchColour[2]-previousColour[2]])
+			seColourDistance = np.linalg.norm([sePatchColour[0]-previousColour[0], sePatchColour[1]-previousColour[1], sePatchColour[2]-previousColour[2]])
+			sColourDistance = np.linalg.norm([sPatchColour[0]-previousColour[0], sPatchColour[1]-previousColour[1], sPatchColour[2]-previousColour[2]])
+			swColourDistance = np.linalg.norm([swPatchColour[0]-previousColour[0], swPatchColour[1]-previousColour[1], swPatchColour[2]-previousColour[2]])
+			wColourDistance = np.linalg.norm([wPatchColour[0]-previousColour[0], wPatchColour[1]-previousColour[1], wPatchColour[2]-previousColour[2]])
+			nwColourDistance = np.linalg.norm([nwPatchColour[0]-previousColour[0], nwPatchColour[1]-previousColour[1], nwPatchColour[2]-previousColour[2]])
+
+			if nColourDistance < colourDistance:
+				colourDistance = nColourDistance
+				indicatedLocation = nPatch
+			if neColourDistance < colourDistance:
+				colourDistance = neColourDistance
+				indicatedLocation = nePatch
+			if eColourDistance < colourDistance:
+				colourDistance = eColourDistance
+				indicatedLocation = ePatch
+			if seColourDistance < colourDistance:
+				colourDistance = seColourDistance
+				indicatedLocation = sePatch
+			if sColourDistance < colourDistance:
+				colourDistance = sColourDistance
+				indicatedLocation = sPatch
+			if swColourDistance < colourDistance:
+				colourDistance = swColourDistance
+				indicatedLocation = swPatch
+			if wColourDistance < colourDistance:
+				colourDistance = wColourDistance
+				indicatedLocation = wPatch
+			if nwColourDistance < colourDistance:
+				colourDistance = nwColourDistance
+				indicatedLocation = nwPatch
+
+	sampleColour = patchColour(image, indicatedLocation)
+
+	# Finding the edges
+	region = image[indicatedLocation[0]-50:indicatedLocation[0]+50,indicatedLocation[1]-50:indicatedLocation[1]+50]
+	regionGray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
+	regionEdges = sobel(regionGray)
+	regionEdges[regionEdges<40] = 0
+	regionEdges[regionEdges>=40] = 1
+	
+	regionEdges.astype(bool)
+
+	imageEdges = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
+	imageEdges[indicatedLocation[0]-50:indicatedLocation[0]+50,indicatedLocation[1]-50:indicatedLocation[1]+50] = regionEdges
+
+	# Traversing
 	visited = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
+	toVisit = Queue.Queue()
 	notSameColour = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
+
+	toVisit.put(indicatedLocation)
 
 	sumX = 0
 	sumY = 0
 	total = 0.0
-	visited, notSameColour, sumX, sumY, total = traverseOut(image, indicatedLocation[0], indicatedLocation[1], sampleColour, visited, notSameColour, sumX, sumY, total)
+
+	visited[indicatedLocation[0],indicatedLocation[1]] = True
+	
+	while not toVisit.empty():
+		currentX,currentY,visited,notSameColour,toVisit = traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges)
+		sumX += currentX
+		sumY += currentY
+		total += 1
 
 	bottomestX = 0
 	bottomestY = 0
@@ -194,27 +301,29 @@ def componentCoords(image,indicatedLocation):
 					bottomestX = i
 					bottomestY = j
 
-
+	# Centre of the component is assumed to be at the average of all of its coordinates
 	centreX = sumX/total
 	centreY = sumY/total
 
-	return centreX, centreY, bottomestX, bottomestY, notSameColour, visited
+	centreX = int(centreX)
+	centreY = int(centreY)
+	bottomestX = int(bottomestX)
+	bottomestY = int(bottomestY)
+
+	return centreX, centreY, bottomestX, bottomestY, notSameColour, visited, sampleColour
 	
-def traverseOut(image,i,j,sampleColour,visited, notSameColour, sumX, sumY, total):
+def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges):
 	tolerance = 0.2
 
-	visited[i,j] = True
+	[i,j] = toVisit.get()
+
 	sameColour = True
 
-	sampleGreen = sampleColour[0]
-	sampleRed = sampleColour[1]
-	sampleBlue = sampleColour[2]
-
-	green = image[i,j,0]
-	red = image[i,j,1]
-	blue = image[i,j,2]
+	[sampleGreen, sampleRed, sampleBlue] = sampleColour
+	[green, red, blue] = image[i,j]
 
 	# Check if the investigated coordinate is of the same colour
+	# MAYBE CHANGE THAT TO THE EUCLIDEAN DISTANCE??
 	if green < sampleGreen*(1-tolerance) or green > sampleGreen*(1+tolerance):
 		sameColour = False
 
@@ -225,30 +334,35 @@ def traverseOut(image,i,j,sampleColour,visited, notSameColour, sumX, sumY, total
 		sameColour = False
 
 	if not sameColour:
-		sumX += i
-		sumY += j
-		total += 1
 		notSameColour[i,j] = True
-		return visited, notSameColour, sumX, sumY, total
+		return i, j, visited, notSameColour, toVisit
 
 	# If we are still within the same sample, traverse out further
 	if sameColour:
-		if not visited[i-1,j-1]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i-1,j-1,sampleColour,visited, notSameColour, sumX, sumY, total)
-		if not visited[i-1,j]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i-1,j,sampleColour,visited, notSameColour, sumX, sumY, total)
-		if not visited[i-1,j+1]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i-1,j+1,sampleColour,visited, notSameColour, sumX, sumY, total)
-		if not visited[i,j+1]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i,j+1,sampleColour,visited, notSameColour, sumX, sumY, total)
-		if not visited[i+1,j+1]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i+1,j+1,sampleColour,visited, notSameColour, sumX, sumY, total)
-		if not visited[i+1,j]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i+1,j,sampleColour,visited, notSameColour, sumX, sumY, total)
-		if not visited[i+1,j-1]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i+1,j-1,sampleColour,visited, notSameColour, sumX, sumY, total)
-		if not visited[i,j-1]:
-			visited, notSameColour, sumX, sumY, total = traverseOut(image,i,j-1,sampleColour,visited, notSameColour, sumX, sumY, total)
+		if not visited[i-1,j-1] and not imageEdges[i-1,j-1]:
+			visited[i-1,j-1] = True
+			toVisit.put([i-1,j-1])
+		if not visited[i-1,j] and not imageEdges[i-1,j]:
+			visited[i-1,j] = True
+			toVisit.put([i-1,j])
+		if not visited[i-1,j+1] and not imageEdges[i-1,j+1]:
+			visited[i-1,j+1] = True
+			toVisit.put([i-1,j+1])
+		if not visited[i,j+1] and not imageEdges[i,j-1]:
+			visited[i,j+1] = True
+			toVisit.put([i,j+1])
+		if not visited[i+1,j+1] and not imageEdges[i+1,j+1]:
+			visited[i+1,j+1] = True
+			toVisit.put([i+1,j+1])
+		if not visited[i+1,j] and not imageEdges[i+1,j]:
+			visited[i+1,j] = True
+			toVisit.put([i+1,j])
+		if not visited[i+1,j-1] and not imageEdges[i+1,j-1]:
+			visited[i+1,j-1] = True
+			toVisit.put([i+1,j-1])
+		if not visited[i,j-1] and not imageEdges[i,j-1]:
+			visited[i,j-1] = True
+			toVisit.put([i,j-1])
 
-	return visited, notSameColour, sumX, sumY, total
+	return i, j, visited, notSameColour, toVisit
 
