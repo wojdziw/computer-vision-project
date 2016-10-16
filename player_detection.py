@@ -1,5 +1,4 @@
 import cv2
-import cv2.cv as cv
 import numpy as np
 from functions import *
 
@@ -10,15 +9,15 @@ bottomestX = 225
 bottomestY = 375
 
 # opening the video
-video = cv2.VideoCapture('beachVolleyball/beachVolleyball2.mov')
-frameCount = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
-fps = video.get(cv2.cv.CV_CAP_PROP_FPS)
-frameWidth = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-frameHeight = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+video = cv2.VideoCapture('vids/beachVolleyball2.mov')
+frameCount = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+fps = video.get(cv2.CAP_PROP_FPS)
+frameWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+frameHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # Define the codec and create VideoWriter object
-fourcc = cv2.cv.CV_FOURCC(*'XVID')
-out = cv2.VideoWriter('output.avi',fourcc, 40, (frameWidth, frameHeight))
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('output/output.mp4',fourcc, fps, (frameWidth, frameHeight))
 
 _,image = video.read()
 
