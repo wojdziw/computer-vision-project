@@ -5,9 +5,6 @@ from functions import *
 
 # indicating the location
 indicatedLocation = [170,420] # working 70 frames
-# indicatedLocation = [88,427]
-bottomestX = 225
-bottomestY = 375
 
 # opening the video
 video = cv2.VideoCapture('beachVolleyball/beachVolleyball2.mov')
@@ -42,7 +39,7 @@ redAvg = np.mean(sample[:,:,2])
 # Finding the average colour of the component
 previousColour = [greenAvg,blueAvg,redAvg]
 
-for fr in range(1,315):
+for fr in range(1,350):
 	print fr
 	# finding the centre of the component (e.g. leg) and its bottom point
 	centreX, centreY, bottomestX, bottomestY, notSameColour, visited, previousColour = componentCoords(image, indicatedLocation, previousColour)
@@ -92,9 +89,3 @@ for fr in range(1,315):
 
 video.release()
 out.release()
-
-
-
-
-# # saving into a file
-# cv2.imwrite('frame100_experiment.jpg', image)

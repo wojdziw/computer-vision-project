@@ -167,6 +167,59 @@ def corner_detector(image, imageRGB):
 
 	return imageRGB
 
+def rgbToHue(colour):
+	hue = 0
+
+	b = colour[0]/255.0
+	g = colour[1]/255.0
+	r = colour[2]/255.0
+	Cmax = max(b,g,r)
+	Cmin = min(b,g,r)
+	delta = Cmax-Cmin
+
+	if delta == 0:
+		hue = 0
+	elif Cmax == r:
+		hue = 60*(((g-b)/delta)%6)
+	elif Cmax == g:
+		hue = 60*(((b-r)/delta)+2)
+	elif Cmax == b:
+		hue = 60*(((r-g)/delta)+4)
+
+	return hue
+
+def rgbToSat(colour):
+	sat = 0
+
+	b = colour[0]/255.0
+	g = colour[1]/255.0
+	r = colour[2]/255.0
+	Cmax = max(b,g,r)
+	Cmin = min(b,g,r)
+	delta = Cmax-Cmin
+
+	if Cmax == 0:
+		s = 0
+	else:
+		s = delta/Cmax
+
+	return sat			
+
+
+def rgbToBri(colour):
+	bri = 0
+
+	b = colour[0]/255.0
+	g = colour[1]/255.0
+	r = colour[2]/255.0
+	Cmax = max(b,g,r)
+	Cmin = min(b,g,r)
+	delta = Cmax-Cmin
+
+	bri = Cmax
+
+	return bri
+
 def patchColour(image,indicatedLocation):
 	# Cropping out a window around the indicated component to find its colour	
 	sample = image[indicatedLocation[0]-5:indicatedLocation[0]+5,indicatedLocation[1]-5:indicatedLocation[1]+5]
@@ -176,30 +229,40 @@ def patchColour(image,indicatedLocation):
 
 	return [greenAvg,blueAvg,redAvg]
 
-def colourDistance(colour1,colour2):
-	return np.linalg.norm([colour1[0]-colour2[0], colour1[1]-colour2[1], colour1[2]-colour2[2]])
+def colourEuclideanDistance(colour1,colour2):
+	colour1Hue = rgbToHue(colour1)
+	colour2Hue = rgbToHue(colour2)
+
+	hueDistance = min(abs(colour1Hue-colour2Hue), 360-abs(colour1Hue-colour2Hue));
+	rgbDistance = np.linalg.norm([colour1[0]-colour2[0], colour1[1]-colour2[1], colour1[2]-colour2[2]])
+
+	return hueDistance
+
+def hueDistance(colour1,colour2):
+	colour1Hue = rgbToHue(colour1)
+	colour2Hue = rgbToHue(colour2)
+
+	hueDistance = min(abs(colour1Hue-colour2Hue), 360-abs(colour1Hue-colour2Hue));
+	rgbDistance = np.linalg.norm([colour1[0]-colour2[0], colour1[1]-colour2[1], colour1[2]-colour2[2]])
+
+	return hueDistance
 
 def componentCoords(image,indicatedLocation,previousColour):
 	# Finding the average colour of the component
 	sampleColour = patchColour(image,indicatedLocation)
 	a = indicatedLocation
 
-	# Checking how far the previous colour patch and the new one is
-	sampleColourNorm = np.linalg.norm(sampleColour)
-	previousColourNorm = np.linalg.norm(previousColour)
-
 	# Calculating different measures of how different the previous and current colour patches are
-	normDifference = int(100*np.abs(previousColourNorm-sampleColourNorm)/previousColourNorm)
-	colourDistance = np.linalg.norm([sampleColour[0]-previousColour[0], sampleColour[1]-previousColour[1], sampleColour[2]-previousColour[2]])
+	colourDistance = colourEuclideanDistance(sampleColour,previousColour)
+	hueDist = hueDistance(sampleColour,previousColour)
 
-	print("normDifference: " + str(normDifference)+"%")
-	print("colour distance: " + str(colourDistance))
+	print "For rgb distance: " + str(colourDistance) + " the hsv distance is: " + str(hueDist)
 
 	# CORRECTING THE COMPONENT CENTRAL LOCATION
 
 	# If the colour patches are very different - start looking for a new starting point
 	# Trying to find the point in the neighborhood that is more similar to the previous patch
-	threshold = 20
+	threshold = 1.0
 
 	# SOMETIMES THESE DIRECTIONS AREN'T ENOUGH!!!!
 	if colourDistance > threshold:
@@ -224,14 +287,14 @@ def componentCoords(image,indicatedLocation,previousColour):
 			wPatchColour = patchColour(image, wPatch)
 			nwPatchColour = patchColour(image, nwPatch)
 
-			nColourDistance = np.linalg.norm([nPatchColour[0]-previousColour[0], nPatchColour[1]-previousColour[1], nPatchColour[2]-previousColour[2]])
-			neColourDistance = np.linalg.norm([nePatchColour[0]-previousColour[0], nePatchColour[1]-previousColour[1], nePatchColour[2]-previousColour[2]])
-			eColourDistance = np.linalg.norm([ePatchColour[0]-previousColour[0], ePatchColour[1]-previousColour[1], ePatchColour[2]-previousColour[2]])
-			seColourDistance = np.linalg.norm([sePatchColour[0]-previousColour[0], sePatchColour[1]-previousColour[1], sePatchColour[2]-previousColour[2]])
-			sColourDistance = np.linalg.norm([sPatchColour[0]-previousColour[0], sPatchColour[1]-previousColour[1], sPatchColour[2]-previousColour[2]])
-			swColourDistance = np.linalg.norm([swPatchColour[0]-previousColour[0], swPatchColour[1]-previousColour[1], swPatchColour[2]-previousColour[2]])
-			wColourDistance = np.linalg.norm([wPatchColour[0]-previousColour[0], wPatchColour[1]-previousColour[1], wPatchColour[2]-previousColour[2]])
-			nwColourDistance = np.linalg.norm([nwPatchColour[0]-previousColour[0], nwPatchColour[1]-previousColour[1], nwPatchColour[2]-previousColour[2]])
+			nColourDistance = colourEuclideanDistance(nPatchColour,previousColour)
+			neColourDistance = colourEuclideanDistance(nePatchColour,previousColour)
+			eColourDistance = colourEuclideanDistance(ePatchColour,previousColour)
+			seColourDistance = colourEuclideanDistance(sePatchColour,previousColour)
+			sColourDistance = colourEuclideanDistance(sPatchColour,previousColour)
+			swColourDistance = colourEuclideanDistance(swPatchColour,previousColour)
+			wColourDistance = colourEuclideanDistance(wPatchColour,previousColour)
+			nwColourDistance = colourEuclideanDistance(nwPatchColour,previousColour)
 
 			if nColourDistance < colourDistance:
 				colourDistance = nColourDistance
@@ -321,6 +384,7 @@ def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges):
 
 	[sampleGreen, sampleRed, sampleBlue] = sampleColour
 	[green, red, blue] = image[i,j]
+	currentColour = image[i,j]
 
 	# Check if the investigated coordinate is of the same colour
 	# MAYBE CHANGE THAT TO THE EUCLIDEAN DISTANCE??
@@ -332,6 +396,10 @@ def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges):
 
 	if blue < sampleBlue*(1-tolerance) or blue > sampleBlue*(1+tolerance):
 		sameColour = False
+
+	# # Comparing colour based on Euclidean distance
+	# colourDistance = colourEuclideanDistance(sampleColour, currentColour)
+	# sameColour = colourDistance < 30
 
 	if not sameColour:
 		notSameColour[i,j] = True

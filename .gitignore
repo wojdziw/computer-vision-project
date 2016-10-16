@@ -1,4 +1,5 @@
-beachVolleyball/
+beach-volleyball-films/
 *.jpg
 *.pyc
 *.avi
+player-detection/individual-frames
