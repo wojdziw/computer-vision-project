@@ -30,7 +30,7 @@ def playerDetec(videoIdx, startPos):
 
 	# Read first frame
 	_,img = vidObj.read()
-	outImg = np.zeros(img.shape, np.uint8)
+	outImg = img
 	# Print first frame to find where to start looking
 	#cv2.imwrite('vid'+vidNr+'.jpg', img)
 
@@ -49,10 +49,10 @@ def playerDetec(videoIdx, startPos):
 
 
 	# Use gaussian blur
-	#grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	#gauss = gauss_kernels(5,1)
-	#img = MyConvolve(grayImg, gauss)
-	#cv2.imwrite('img.jpg', img)
+	grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	gauss = gauss_kernels(5,1)
+	img = MyConvolve(grayImg, gauss)
+	cv2.imwrite('output/blurimg.jpg', img)
 
 
 	# Create SIFT and find the best features in the first frame
@@ -93,7 +93,7 @@ def playerDetec(videoIdx, startPos):
 
 
 	# Draw first frame
-	outImg = img
+	#outImg = img
 	#cv2.drawKeypoints(img, kp1, outImg, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 	drawSq = np.zeros(mask.shape)
 	drawSq[firstPt[0]-5:firstPt[0]+5, firstPt[1]-5:firstPt[1]+5] = 255 
@@ -104,12 +104,14 @@ def playerDetec(videoIdx, startPos):
 
 	for fr in range(1, frCount):
 
+		# Read next frame and prepare output image
 		_,nextFr = vidObj.read()
+		outImg = nextFr
 
 		# Use gaussian blur
-		#grayImg = cv2.cvtColor(nextFr, cv2.COLOR_BGR2GRAY)
-		#gauss = gauss_kernels(5,1)
-		#nextFr = MyConvolve(grayImg, gauss)
+		grayImg = cv2.cvtColor(nextFr, cv2.COLOR_BGR2GRAY)
+		gauss = gauss_kernels(5,1)
+		grayImg = MyConvolve(grayImg, gauss)
 
 		# Find all desciptors in an area around the first point 
 		mask = np.zeros(mask.shape, np.uint8)
@@ -124,7 +126,7 @@ def playerDetec(videoIdx, startPos):
 
 		# DMatch objects, (have distance, trainIdx, queryIdx (index of descriptors) & imgIdx) 
 		matches = sorted(matches, key = lambda m:m.distance) # Sort by distance
-		#print len(matches)
+		print len(matches)
 		
 		if(len(matches)>=1):
 			newPt = kp2[matches[0].trainIdx].pt 	# Copy the 2D coord from best descriptor
@@ -138,7 +140,6 @@ def playerDetec(videoIdx, startPos):
 		print newPt
 
 		# Draw red square around point
-		outImg = nextFr
 		#cv2.drawKeypoints(nextFr, kp2, outImg, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 		drawSq = np.zeros(mask.shape)
 		drawSq[newPt[0]-5:newPt[0]+5, newPt[1]-5:newPt[1]+5] = 255 

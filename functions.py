@@ -21,7 +21,7 @@ def gauss_kernels(size, sigma=1.0):
 
 
 def MyConvolve (img, kernel):
-	result = np.zeros(img.shape)
+	result = np.zeros(img.shape, np.uint8)
 	rows = img.shape[0]
 	cols = img.shape[1]
 
