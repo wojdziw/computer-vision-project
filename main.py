@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 videoNumber = 2
-video = cv2.VideoCapture('beach-volleyball-films/beachVolleyball'+str(videoNumber)+'.mov')
+video = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 _,image = video.read()
 
 a, b = indicateLocation(image)
