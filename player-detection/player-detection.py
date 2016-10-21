@@ -1,5 +1,5 @@
 import cv2
-import cv2.cv as cv
+# import cv2.cv as cv
 import numpy as np
 from functions import *
 
@@ -7,14 +7,15 @@ from functions import *
 indicatedLocation = [170,420] # working 70 frames
 
 # opening the video
-video = cv2.VideoCapture('beachVolleyball/beachVolleyball2.mov')
-frameCount = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
-fps = video.get(cv2.cv.CV_CAP_PROP_FPS)
-frameWidth = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-frameHeight = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+video = cv2.VideoCapture('../beach-volleyball-films/beachVolleyball2.mov')
+
+frameWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+frameHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+frameFPS = int(video.get(cv2.CAP_PROP_FPS))
+frameCount = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
 
 # Define the codec and create VideoWriter object
-fourcc = cv2.cv.CV_FOURCC(*'XVID')
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output.avi',fourcc, 40, (frameWidth, frameHeight))
 
 _,image = video.read()
@@ -39,7 +40,7 @@ redAvg = np.mean(sample[:,:,2])
 # Finding the average colour of the component
 previousColour = [greenAvg,blueAvg,redAvg]
 
-for fr in range(1,350):
+for fr in range(1,300):
 	print fr
 	# finding the centre of the component (e.g. leg) and its bottom point
 	centreX, centreY, bottomestX, bottomestY, notSameColour, visited, previousColour = componentCoords(image, indicatedLocation, previousColour)
@@ -80,7 +81,7 @@ for fr in range(1,350):
 	image[centreX,centreY-7:centreY+7]=[0,0,255]
 
 	# saving the frame to a jpg
-	frameName = 'individualFrames/frame' + str(fr) + '.jpg'
+	frameName = 'individual-frames/frame' + str(fr) + '.jpg'
 	cv2.imwrite(frameName, image)
 
 	out.write(image)

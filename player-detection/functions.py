@@ -205,7 +205,6 @@ def rgbToSat(colour):
 
 	return sat			
 
-
 def rgbToBri(colour):
 	bri = 0
 
@@ -229,23 +228,108 @@ def patchColour(image,indicatedLocation):
 
 	return [greenAvg,blueAvg,redAvg]
 
-def colourEuclideanDistance(colour1,colour2):
-	colour1Hue = rgbToHue(colour1)
-	colour2Hue = rgbToHue(colour2)
-
-	hueDistance = min(abs(colour1Hue-colour2Hue), 360-abs(colour1Hue-colour2Hue));
-	rgbDistance = np.linalg.norm([colour1[0]-colour2[0], colour1[1]-colour2[1], colour1[2]-colour2[2]])
-
-	return hueDistance
-
 def hueDistance(colour1,colour2):
 	colour1Hue = rgbToHue(colour1)
 	colour2Hue = rgbToHue(colour2)
 
-	hueDistance = min(abs(colour1Hue-colour2Hue), 360-abs(colour1Hue-colour2Hue));
-	rgbDistance = np.linalg.norm([colour1[0]-colour2[0], colour1[1]-colour2[1], colour1[2]-colour2[2]])
+	hueDist = min(abs(colour1Hue-colour2Hue), 360-abs(colour1Hue-colour2Hue));
 
-	return hueDistance
+	return hueDist
+
+def rgbDistance(colour1,colour2):
+	rgbDist = np.linalg.norm([colour1[0]-colour2[0], colour1[1]-colour2[1], colour1[2]-colour2[2]])
+
+	return rgbDist
+
+# Convert rgb to Lab using RGB -> XYZ -> Lab
+def rgb2lab(rgb):
+
+	#print rgb
+	## Convert RGB to XYZ
+	num = 0
+	RGB = [0, 0, 0]
+
+	for value in rgb :
+	   value = float(value) / 255
+
+	   if value > 0.04045 :
+	       value = np.power(((value+0.055)/1.055), 2.4)
+	   else :
+	       value = value / 12.92
+
+	   RGB[num] = value * 100
+	   num = num + 1
+
+	XYZ = [0, 0, 0,]
+
+	X = RGB[0] * 0.4124 + RGB[1] * 0.3576 + RGB[2] * 0.1805
+	Y = RGB[0] * 0.2126 + RGB[1] * 0.7152 + RGB[2] * 0.0722
+	Z = RGB[0] * 0.0193 + RGB[1] * 0.1192 + RGB[2] * 0.9505
+
+	XYZ[0] = round(X, 4)
+	XYZ[1] = round(Y, 4)
+	XYZ[2] = round(Z, 4)
+
+	#print XYZ
+	## Convert XYZ to Lab
+
+	XYZ[0] = float(XYZ[0]) / 95.047		# ref_X =  95.047   Observer= 2 deg, Illuminant= D65
+	XYZ[1] = float(XYZ[1]) / 100.0		# ref_Y = 100.000
+	XYZ[2] = float(XYZ[2]) / 108.883	# ref_Z = 108.883
+
+	num = 0
+	for value in XYZ :
+
+	   if value > 0.008856 :
+	       value = np.power(value, float(1)/3)
+	   else :
+	       value = (7.787*value) + (16/116)
+
+	   XYZ[num] = value
+	   num = num + 1
+
+	Lab = [0, 0, 0]
+
+	L = (116 * XYZ[1]) - 16
+	a = 500 * (XYZ[0] - XYZ[1])
+	b = 200 * (XYZ[1] - XYZ[2])
+
+	Lab [ 0 ] = round( L, 4 )
+	Lab [ 1 ] = round( a, 4 )
+	Lab [ 2 ] = round( b, 4 )
+
+	#print Lab
+
+	return Lab
+
+
+# Calculate the difference between two Lab colors
+def deltaE(lab1, lab2):
+
+	L1, a1, b1 = lab1[0], lab1[1], lab1[2]
+	L2, a2, b2 = lab2[0], lab2[1], lab2[2]
+
+	diff = np.sqrt(np.power(L1-L2, 2) + np.power(a1-a2, 2) + np.power(b1-b2, 2))
+
+	return diff
+
+def labDistance(colour1,colour2):
+	lab1 = rgb2lab(colour1)
+	lab2 = rgb2lab(colour2)
+
+	labDist = deltaE(lab1, lab2)
+
+	return labDist
+
+def colourEuclideanDistance(colour1,colour2):
+	colour1Hue = rgbToHue(colour1)
+	colour2Hue = rgbToHue(colour2)
+
+	hueDist = hueDistance(colour1, colour2)
+	rgbDist = rgbDistance(colour1, colour2)
+	labDist = labDistance(colour1, colour2)
+
+	return labDist
 
 def componentCoords(image,indicatedLocation,previousColour):
 	# Finding the average colour of the component
@@ -254,15 +338,13 @@ def componentCoords(image,indicatedLocation,previousColour):
 
 	# Calculating different measures of how different the previous and current colour patches are
 	colourDistance = colourEuclideanDistance(sampleColour,previousColour)
-	hueDist = hueDistance(sampleColour,previousColour)
 
-	print "For rgb distance: " + str(colourDistance) + " the hsv distance is: " + str(hueDist)
 
 	# CORRECTING THE COMPONENT CENTRAL LOCATION
 
 	# If the colour patches are very different - start looking for a new starting point
 	# Trying to find the point in the neighborhood that is more similar to the previous patch
-	threshold = 1.0
+	threshold = 10
 
 	# SOMETIMES THESE DIRECTIONS AREN'T ENOUGH!!!!
 	if colourDistance > threshold:
@@ -397,9 +479,9 @@ def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges):
 	if blue < sampleBlue*(1-tolerance) or blue > sampleBlue*(1+tolerance):
 		sameColour = False
 
-	# # Comparing colour based on Euclidean distance
-	# colourDistance = colourEuclideanDistance(sampleColour, currentColour)
-	# sameColour = colourDistance < 30
+	# Comparing colour based on Euclidean distance
+	colourDistance = colourEuclideanDistance(sampleColour, currentColour)
+	sameColour = colourDistance < 15
 
 	if not sameColour:
 		notSameColour[i,j] = True
