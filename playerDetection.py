@@ -5,8 +5,171 @@ import sys
 from functions import *
 
 
+# Given a starting position it tracks using color
+def colorPlayerDetec(videoIdx, startPos, radius):
+
+	vidNr = videoIdx
+
+	# Where to start look
+	indLoc = np.zeros(2, int)
+	indLoc[0] = startPos[0]
+	indLoc[1] = startPos[1]
+	rad = int(radius/2)
+
+	# Read video object
+	vidObj = cv2.VideoCapture('vids/beachVolleyball'+vidNr+'.mov')
+
+	frWidth = int(vidObj.get(cv2.CAP_PROP_FRAME_WIDTH))
+	frHeight = int(vidObj.get(cv2.CAP_PROP_FRAME_HEIGHT))
+	frFPS = int(vidObj.get(cv2.CAP_PROP_FPS))
+	frCount = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
+
+	# Define the codec and create VideoWriter object
+	fourcc = cv2.VideoWriter_fourcc(*'XVID')
+	outObj = cv2.VideoWriter('output/vid'+vidNr+'.avi',fourcc, frFPS, (frWidth, frHeight))
+
+	# Read first frame
+	_,img = vidObj.read()
+	outImg = img
+	# Print first frame to find where to start looking
+	#cv2.imwrite('output/detStart'+vidNr+'.jpg', img)
+
+	# Initialize output
+	pos = np.zeros([frCount, 2], int)
+
+	# Define the region mask where to look for colors
+	mask = np.zeros(img.shape[:2], np.uint8)
+	mask[indLoc[0]-rad:indLoc[0]+rad,indLoc[1]-rad:indLoc[1]+rad] = 255
+	#cv2.imwrite('output/mask.jpg', mask)
+
+	# Test whether we found the right spot
+	test = np.zeros([2*rad, 2*rad, 3], np.uint8)
+	test[:,:] = img[indLoc[0]-rad:indLoc[0]+rad,indLoc[1]-rad:indLoc[1]+rad]
+	cv2.imwrite('output/test.jpg', test)
+
+	'''
+	# Use gaussian blur
+	grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	gauss = gauss_kernels(5,1)
+	img = MyConvolve(grayImg, gauss)
+	cv2.imwrite('output/blurimg.jpg', img)
+	'''
+
+	# Find average RGB color 
+	RGBcolor = avgColor(test)
+
+	print RGBcolor
+
+	# Convert RGB to L*a*b
+	Labcolor1 = rgb2lab(RGBcolor)
+
+	print Labcolor1
+
+	# Compute deltaE between Lab values
+
+	### Traverse down
+	#firstPt = traveseDown(indLoc, color) 
+
+	'''
+	pos[0] = firstPt
+	print firstPt
+
+
+	# Draw first frame
+	drawSq = np.zeros(mask.shape)
+	drawSq[firstPt[0]-5:firstPt[0]+5, firstPt[1]-5:firstPt[1]+5] = 255 
+	drawSq[firstPt[0]-3:firstPt[0]+3, firstPt[1]-3:firstPt[1]+3] = 0
+	drawMask = (drawSq == 255)
+	outImg[drawMask] = [0, 0, 255] 
+	outObj.write(outImg)
+
+	for fr in range(1, frCount):
+
+		# Read next frame and prepare output image
+		_,nextFr = vidObj.read()
+		outImg = nextFr
+
+		
+		# Use gaussian blur
+		grayImg = cv2.cvtColor(nextFr, cv2.COLOR_BGR2GRAY)
+		gauss = gauss_kernels(5,1)
+		grayImg = MyConvolve(grayImg, gauss)
+		
+
+		# Find all desciptors in an area around the first point 
+		mask = np.zeros(mask.shape, np.uint8)
+		mask[firstPt[0]-rad:firstPt[0]+rad,firstPt[1]-rad:firstPt[1]+rad] = 255
+		(kp2, desc2) = sift.detectAndCompute(nextFr, mask)
+		if desc2 is None: # Didn't find any descriptors, keep old values
+			print "No detections"
+
+		else: 
+
+			# Define Brute Force matcher (Find the nearest matching descriptor)
+			bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
+			matches = bf.match(desc1, desc2) # Returns only the best result for every descriptor
+			#matches = bf.match(desc1, desc2, 1) # Returns matches within Hamming distance (NOT pixels)
+
+			# DMatch objects, (have distance, trainIdx, queryIdx (index of descriptors) & imgIdx) 
+			matches = sorted(matches, key = lambda m:m.distance) # Sort by distance
+			#print len(desc1)
+			#print len(matches)
+			
+
+			if(len(matches)>5):
+				stop = 5
+			else:
+				stop = len(matches)
+
+			newPt = np.zeros([stop, 2], int)
+			desc1 = np.zeros([stop, 128], np.float32)
+			#sumX, sumY = 0, 0
+
+			# Only save the best matches
+			for i in range(stop):
+				#print matches[i].distance
+			#if(len(matches)>=1):
+				newPt[i] = kp2[matches[i].trainIdx].pt 			# Copy the 2D coord from best descriptors
+				newPt[i] = int(newPt[i, 1]), int(newPt[i, 0])	# Convert to int and switch places
+				desc1[i, :] = desc2[matches[i].trainIdx]
+				#sumY += newPt[i, 0]
+				#sumX += newPt[i, 1]
+
+			# Replace old values
+			#desc1 = np.matrix(desc2[matches[0].trainIdx]) 	# Use only best descriptor
+			#desc1 = desc2 									# Use all descriptors 
+			#firstPt = [int(sumY/stop), int(sumX/stop)]		# Use the average
+			firstPt = newPt[0]								# Use best match
+
+			print firstPt
+	
+
+
+		# Draw red square around point
+		#cv2.drawKeypoints(nextFr, kp2, outImg, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+		drawSq = np.zeros(mask.shape)
+		drawSq[firstPt[0]-5:firstPt[0]+5, firstPt[1]-5:firstPt[1]+5] = 255 
+		drawSq[firstPt[0]-3:firstPt[0]+3, firstPt[1]-3:firstPt[1]+3] = 0
+		drawMask = (drawSq == 255)
+		outImg[drawMask] = [0, 0, 255]  
+		outObj.write(outImg)
+
+		pos[fr] = firstPt
+	'''
+
+
+	vidObj.release()
+	outObj.release()
+
+
+	return pos
+
+
+
+
+
 # Given a starting position it tracks using SIFT descriptors
-def playerDetec(videoIdx, startPos, radius):
+def siftPlayerDetec(videoIdx, startPos, radius):
 
 	vidNr = videoIdx
 
@@ -32,7 +195,7 @@ def playerDetec(videoIdx, startPos, radius):
 	_,img = vidObj.read()
 	outImg = img
 	# Print first frame to find where to start looking
-	cv2.imwrite('output/detStart'+vidNr+'.jpg', img)
+	#cv2.imwrite('output/detStart'+vidNr+'.jpg', img)
 
 	# Initialize output
 	pos = np.zeros([frCount, 2], int)
@@ -40,12 +203,12 @@ def playerDetec(videoIdx, startPos, radius):
 	# Define the region mask where to look
 	mask = np.zeros(img.shape[:2], np.uint8)
 	mask[indLoc[0]-rad:indLoc[0]+rad,indLoc[1]-rad:indLoc[1]+rad] = 255
-	cv2.imwrite('output/mask.jpg', mask)
+	#cv2.imwrite('output/mask.jpg', mask)
 
 	# Test whether we found the right spot
 	test = np.zeros(img.shape, np.uint8)
 	test[indLoc[0]-rad:indLoc[0]+rad,indLoc[1]-rad:indLoc[1]+rad] = img[indLoc[0]-rad:indLoc[0]+rad,indLoc[1]-rad:indLoc[1]+rad]
-	cv2.imwrite('output/test.jpg', test)
+	#cv2.imwrite('output/test.jpg', test)
 
 	'''
 	# Use gaussian blur
@@ -75,22 +238,29 @@ def playerDetec(videoIdx, startPos, radius):
 			foot = idx
 			btm = pts[idx][1]
 	'''
+	# Use average
+	#sumX, sumY = 0, 0
+
 	# Find keypoint with strongest response
 	for idx in range(len(kp1)):
+		#sumX += kp1[idx].pt[0]
+		#sumY += kp1[idx].pt[1]
 		if (kp1[idx].response>best):
 			foot = idx
 			best = kp1[idx].response
 
 
 	# Store only the best/lowest result
-	desc1 = np.matrix(desc1[foot]) 		# Comment if all descriptors are used
-
 	#firstPt = [int(pts[foot][1]), int(pts[foot][0])] 		# Lowet desc, change [x, y] to [row, col] 
 	firstPt = [int(kp1[foot].pt[1]), int(kp1[foot].pt[0])]	#Strongest response
+	#firstPt = [int(sumY/len(kp1)), int(sumX/len(kp1))]		# Use avg 
+
 	pos[0] = firstPt
-	#print desc1
 	print firstPt
 
+	#desc1 = np.matrix(desc1[foot]) 		# Comment if all descriptors are used
+	#desc1 = sorted(desc1, key = lambda kp1:kp1.response, reverse=True) # Sort decreasingly by response 
+	#print desc1
 
 	# Draw first frame
 	#cv2.drawKeypoints(img, kp1, outImg, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
@@ -126,36 +296,53 @@ def playerDetec(videoIdx, startPos, radius):
 			# Define Brute Force matcher (Find the nearest matching descriptor)
 			bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
 			matches = bf.match(desc1, desc2) # Returns only the best result for every descriptor
-			#matches = bf.match(desc1, desc2, 5) # Returns matches within Hamming distance (NOT pixels)
+			#matches = bf.match(desc1, desc2, 1) # Returns matches within Hamming distance (NOT pixels)
 
 			# DMatch objects, (have distance, trainIdx, queryIdx (index of descriptors) & imgIdx) 
 			matches = sorted(matches, key = lambda m:m.distance) # Sort by distance
+			#print len(desc1)
 			#print len(matches)
 			
-			if(len(matches)>=1):
-				newPt = kp2[matches[0].trainIdx].pt 	# Copy the 2D coord from best descriptor
-				newPt = [int(newPt[1]), int(newPt[0])]	# Convert to int and switch place
-			
+
+			if(len(matches)>5):
+				stop = 5
+			else:
+				stop = len(matches)
+
+			newPt = np.zeros([stop, 2], int)
+			desc1 = np.zeros([stop, 128], np.float32)
+			#sumX, sumY = 0, 0
+
+			# Only save the best matches
+			for i in range(stop):
+				#print matches[i].distance
+			#if(len(matches)>=1):
+				newPt[i] = kp2[matches[i].trainIdx].pt 			# Copy the 2D coord from best descriptors
+				newPt[i] = int(newPt[i, 1]), int(newPt[i, 0])	# Convert to int and switch places
+				desc1[i, :] = desc2[matches[i].trainIdx]
+				#sumY += newPt[i, 0]
+				#sumX += newPt[i, 1]
+
 			# Replace old values
-			desc1 = np.matrix(desc2[matches[0].trainIdx]) 	# Use only best descriptor
+			#desc1 = np.matrix(desc2[matches[0].trainIdx]) 	# Use only best descriptor
 			#desc1 = desc2 									# Use all descriptors 
-			firstPt = newPt
+			#firstPt = [int(sumY/stop), int(sumX/stop)]		# Use the average
+			firstPt = newPt[0]								# Use best match
 
-			print newPt
-
-		
+			print firstPt
+	
 
 
 		# Draw red square around point
 		#cv2.drawKeypoints(nextFr, kp2, outImg, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 		drawSq = np.zeros(mask.shape)
-		drawSq[newPt[0]-5:newPt[0]+5, newPt[1]-5:newPt[1]+5] = 255 
-		drawSq[newPt[0]-3:newPt[0]+3, newPt[1]-3:newPt[1]+3] = 0
+		drawSq[firstPt[0]-5:firstPt[0]+5, firstPt[1]-5:firstPt[1]+5] = 255 
+		drawSq[firstPt[0]-3:firstPt[0]+3, firstPt[1]-3:firstPt[1]+3] = 0
 		drawMask = (drawSq == 255)
 		outImg[drawMask] = [0, 0, 255]  
 		outObj.write(outImg)
 
-		pos[fr] = newPt
+		pos[fr] = firstPt
 
 	vidObj.release()
 	outObj.release()

@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import math
 import sys
-from playerDetection import playerDetec
+from playerDetection import *
 
 # Choose which video to process 
 if (sys.argv < 2):
@@ -18,8 +18,8 @@ else:
 
 # Where to start look
 pl1 = np.zeros([4, 2], int)
-pl1[0, 0] = 235 #uint8(sys,argv[3])
-pl1[0, 1] = 496 #uint8(sys.argv[4])
+pl1[0, 0] = 220 #235 #uint8(sys,argv[3])
+pl1[0, 1] = 502 #496 #uint8(sys.argv[4])
 pl1[1, 0] = 111
 pl1[1, 1] = 206
 pl1[2, 0] = 75
@@ -28,6 +28,8 @@ pl1[3, 0] = 68
 pl1[3, 1] = 168
 
 
-playerPos = playerDetec(vidNr, pl1[0, :], radius)
+playerPos = colorPlayerDetec(vidNr, pl1[0, :], radius)
+
+#playerPos = siftPlayerDetec(vidNr, pl1[0, :], radius)
 
 #print playerPos
