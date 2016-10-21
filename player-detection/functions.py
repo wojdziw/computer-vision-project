@@ -478,17 +478,6 @@ def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges):
 	[green, red, blue] = image[i,j]
 	currentColour = image[i,j]
 
-	# Check if the investigated coordinate is of the same colour
-	# REPLACED BELOW BY THE LAB DISTANCE
-	# if green < sampleGreen*(1-tolerance) or green > sampleGreen*(1+tolerance):
-	# 	sameColour = False
-
-	# if red < sampleRed*(1-tolerance) or red > sampleRed*(1+tolerance):
-	# 	sameColour = False
-
-	# if blue < sampleBlue*(1-tolerance) or blue > sampleBlue*(1+tolerance):
-	# 	sameColour = False
-
 	# Comparing colour based on Euclidean distance
 	threshold = 6
 	colourDistance = findColourDistance(sampleColour, currentColour)

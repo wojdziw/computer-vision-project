@@ -1,14 +1,15 @@
 import cv2
-# import cv2.cv as cv
 import numpy as np
 from functions import *
 from annotationFunctions import *
 
 # indicating the location
-indicatedLocation = [170,420] # working 70 frames
+# indicatedLocation = [170,420]
+indicatedLocation = [254,342]
 
 # opening the video
-video = cv2.VideoCapture('../beach-volleyball-films/beachVolleyball2.mov')
+# video = cv2.VideoCapture('../beach-volleyball-films/beachVolleyball2.mov') - working
+video = cv2.VideoCapture('../beach-volleyball-films/beachVolleyball5.mov')
 
 frameWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
 frameHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
