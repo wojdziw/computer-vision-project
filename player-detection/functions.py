@@ -336,9 +336,10 @@ def findColourDistance(colour1,colour2):
 def findNewCentre(image, indicatedLocation, previousColour):
 	sampleColour = patchColour(image,indicatedLocation)
 	colourDistance = findColourDistance(sampleColour,previousColour)
+	rayRange = 10
 
 	print("Colour distance bad")
-	for i in range(1,10):
+	for i in range(1,rayRange):
 
 		nPatch = [indicatedLocation[0]-2*i,indicatedLocation[1]]
 		nePatch = [indicatedLocation[0]-2*i,indicatedLocation[1]+2*i]
