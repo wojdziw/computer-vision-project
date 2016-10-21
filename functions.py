@@ -50,6 +50,7 @@ def MyConvolve (img, kernel):
 	return result
 
 
+# Calculate the average RGB values
 def avgColor(area):
 
 	color = np.zeros(3, np.uint8)
@@ -124,12 +125,34 @@ def rgb2lab(rgb):
 	return Lab
 
 
-# Calculate the difference between two Lab colors
+# Calculate the difference between two Lab colors (range 0-100, accept colors below 20?)
+# Use DeltaE CIE1976, problem with saturation but best performance
 def deltaE(lab1, lab2):
 
-	L1, a1, b1 = lab1[0], lab1[1] lab1[2]
-	L2, a2, b2 = lab2[0], lab2[1] lab2[2]
+	L1, a1, b1 = lab1[0], lab1[1], lab1[2]
+	L2, a2, b2 = lab2[0], lab2[1], lab2[2]
 
-	diff = np.sqrt(np.power(L1-L2, 2), np.power(a1-a2, 2) np.power(b1-b2, 2))
+	diff = np.sqrt(np.power(L1-L2, 2), np.power(a1-a2, 2), np.power(b1-b2, 2))
 
 	return diff
+
+
+# Traverse down to the bottom-most part with similar 
+# How to make sure we stay on the same player?
+def traveseDown(start, color):
+
+	footPt = np.zeros(2, int)
+	newColor = color
+
+
+	return footPt, newColor
+
+
+# Find closest pixel with similar color
+def findLeg(startPt, color):
+
+	legPt = np.zeros(2, int)
+	newColor = color
+
+
+	return legPt, newColor

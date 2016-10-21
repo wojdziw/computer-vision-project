@@ -57,23 +57,17 @@ def colorPlayerDetec(videoIdx, startPos, radius):
 
 	# Find average RGB color 
 	RGBcolor = avgColor(test)
-
-	print RGBcolor
+	#print RGBcolor
 
 	# Convert RGB to L*a*b
 	Labcolor1 = rgb2lab(RGBcolor)
+	#print Labcolor1
 
-	print Labcolor1
+	# Traverse down
+	firstPt, Labcolor1 = traveseDown(indLoc, Labcolor1) 
 
-	# Compute deltaE between Lab values
-
-	### Traverse down
-	#firstPt = traveseDown(indLoc, color) 
-
-	'''
 	pos[0] = firstPt
 	print firstPt
-
 
 	# Draw first frame
 	drawSq = np.zeros(mask.shape)
@@ -89,78 +83,30 @@ def colorPlayerDetec(videoIdx, startPos, radius):
 		_,nextFr = vidObj.read()
 		outImg = nextFr
 
-		
-		# Use gaussian blur
-		grayImg = cv2.cvtColor(nextFr, cv2.COLOR_BGR2GRAY)
-		gauss = gauss_kernels(5,1)
-		grayImg = MyConvolve(grayImg, gauss)
-		
 
-		# Find all desciptors in an area around the first point 
-		mask = np.zeros(mask.shape, np.uint8)
-		mask[firstPt[0]-rad:firstPt[0]+rad,firstPt[1]-rad:firstPt[1]+rad] = 255
-		(kp2, desc2) = sift.detectAndCompute(nextFr, mask)
-		if desc2 is None: # Didn't find any descriptors, keep old values
-			print "No detections"
+		# Find new point with same lab color (deltaE <20
+		legPt, Legcolor2 = findLeg(firstPt, Labcolor1)
 
-		else: 
+		# TraveseDown
+		newPt, Labcolor2 = traveseDown(legPt, Legcolor2)
 
-			# Define Brute Force matcher (Find the nearest matching descriptor)
-			bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
-			matches = bf.match(desc1, desc2) # Returns only the best result for every descriptor
-			#matches = bf.match(desc1, desc2, 1) # Returns matches within Hamming distance (NOT pixels)
-
-			# DMatch objects, (have distance, trainIdx, queryIdx (index of descriptors) & imgIdx) 
-			matches = sorted(matches, key = lambda m:m.distance) # Sort by distance
-			#print len(desc1)
-			#print len(matches)
-			
-
-			if(len(matches)>5):
-				stop = 5
-			else:
-				stop = len(matches)
-
-			newPt = np.zeros([stop, 2], int)
-			desc1 = np.zeros([stop, 128], np.float32)
-			#sumX, sumY = 0, 0
-
-			# Only save the best matches
-			for i in range(stop):
-				#print matches[i].distance
-			#if(len(matches)>=1):
-				newPt[i] = kp2[matches[i].trainIdx].pt 			# Copy the 2D coord from best descriptors
-				newPt[i] = int(newPt[i, 1]), int(newPt[i, 0])	# Convert to int and switch places
-				desc1[i, :] = desc2[matches[i].trainIdx]
-				#sumY += newPt[i, 0]
-				#sumX += newPt[i, 1]
-
-			# Replace old values
-			#desc1 = np.matrix(desc2[matches[0].trainIdx]) 	# Use only best descriptor
-			#desc1 = desc2 									# Use all descriptors 
-			#firstPt = [int(sumY/stop), int(sumX/stop)]		# Use the average
-			firstPt = newPt[0]								# Use best match
-
-			print firstPt
-	
-
+		# Let comparing color change dynamically
+		Labcolor1 = Labcolor2
+		firstPt = newPt
+		print newPt
 
 		# Draw red square around point
-		#cv2.drawKeypoints(nextFr, kp2, outImg, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 		drawSq = np.zeros(mask.shape)
-		drawSq[firstPt[0]-5:firstPt[0]+5, firstPt[1]-5:firstPt[1]+5] = 255 
-		drawSq[firstPt[0]-3:firstPt[0]+3, firstPt[1]-3:firstPt[1]+3] = 0
+		drawSq[newPt[0]-5:newPt[0]+5, newPt[1]-5:newPt[1]+5] = 255 
+		drawSq[newPt[0]-3:newPt[0]+3, newPt[1]-3:newPt[1]+3] = 0
 		drawMask = (drawSq == 255)
 		outImg[drawMask] = [0, 0, 255]  
 		outObj.write(outImg)
 
-		pos[fr] = firstPt
-	'''
-
+		pos[fr] = newPt
 
 	vidObj.release()
 	outObj.release()
-
 
 	return pos
 
