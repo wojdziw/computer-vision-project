@@ -4,12 +4,13 @@ from functions import *
 from annotationFunctions import *
 
 # indicating the location
-# indicatedLocation = [170,420]
-indicatedLocation = [254,342]
+video2location = [170,420]
+video5location = [254,342]
+indicatedLocation = video5location
 
 # opening the video
-# video = cv2.VideoCapture('../beach-volleyball-films/beachVolleyball2.mov') - working
-video = cv2.VideoCapture('../beach-volleyball-films/beachVolleyball5.mov')
+videoNumber = 5
+video = cv2.VideoCapture('../beach-volleyball-films/beachVolleyball'+str(videoNumber)+'.mov')
 
 frameWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
 frameHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -18,31 +19,28 @@ frameCount = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
 
 # Define the codec and create VideoWriter object
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('output.avi',fourcc, 40, (frameWidth, frameHeight))
+out = cv2.VideoWriter('output' + str(videoNumber) + '.avi',fourcc, 40, (frameWidth, frameHeight))
 
 _,image = video.read()
-
-print(frameCount)
-
-# Problem:
-# Rewrite the findNewCentre function so that it finds the component from the previous frame better
 
 # Cropping out a window around the indicated component to find its colour
 previousColour = patchColour(image, indicatedLocation)
 
 for fr in range(1,frameCount):
-	print fr
+	print str(fr) + " out of " + str(frameCount)
 	# finding the centre of the component (e.g. leg) and its bottom point
-	centreX, centreY, bottomestX, bottomestY, notSameColour, visited, previousColour = componentCoords(image, indicatedLocation, previousColour)
-	indicatedLocation = [centreX, centreY]
+	try:
+		centreX, centreY, bottomestX, bottomestY, notSameColour, visited, previousColour = componentCoords(image, indicatedLocation, previousColour)
+		indicatedLocation = [centreX, centreY]
+	except:
+		print "Crash!"
 
 	# adding the image features
 	image = colourComponentBlack(image, visited)
 	image = drawCrosses(image, centreX, centreY, bottomestX, bottomestY)
 
 	# saving the frame to a jpg
-	frameName = 'individual-frames/frame' + str(fr) + '.jpg'
-	cv2.imwrite(frameName, image)
+	cv2.imwrite('individual-frames/frame' + str(fr) + '.jpg', image)
 
 	# saving the image frame
 	out.write(image)
