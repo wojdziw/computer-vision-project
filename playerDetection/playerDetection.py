@@ -41,7 +41,7 @@ def playerDetection(videoNumber, indicatedLocation):
 		image = drawCrosses(image, centreX, centreY, bottomestX, bottomestY)
 
 		# saving the frame to a jpg
-		cv2.imwrite('individual-frames/frame' + str(fr) + '.jpg', image)
+		cv2.imwrite('individualFrames/frame' + str(fr) + '.jpg', image)
 
 		# saving the image frame
 		out.write(image)
