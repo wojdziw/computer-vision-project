@@ -2,16 +2,18 @@ from Tkinter import *
 from tkFileDialog import askopenfilename
 import Image, ImageTk
 import cv2
+import numpy as np
 
-def indicatePosition(image):
+def indicateLocation(image):
     root = Tk()
 
     imageWidth = image.shape[1]
     imageHeight = image.shape[0]
 
-    rgbImage = image
+    rgbImage = np.zeros(image.shape, np.uint8)
     rgbImage[:,:,0] = image[:,:,2]
     rgbImage[:,:,2] = image[:,:,0]
+    rgbImage[:,:,1] = image[:,:,1]
 
     image = rgbImage
 
