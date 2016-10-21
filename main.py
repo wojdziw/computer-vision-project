@@ -6,7 +6,7 @@ from pickStartPoint import *
 import cv2
 import numpy as np
 
-videoNumber = 2
+videoNumber = 2	
 video = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 _,image = video.read()
 
