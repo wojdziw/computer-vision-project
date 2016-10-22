@@ -4,3 +4,4 @@ beachVolleyballFilms/
 *.pyc
 *.avi
 player-detection/individual-frames
+output/

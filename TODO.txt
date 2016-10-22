@@ -1,0 +1,19 @@
+
+Thoughts:
+- Maybe we need to define the best starting position beforehand for every player/every video to get the best result. 
+At least for me (Adam) it's sometimes very hard to click on the correct pixel when choosing players in background. 
+However, there are a lot of parameters to be tweaked between every player for best result, so we probably can't do all in "one go" regardless.
+
+TODO for player detection:
+
+- Figure out how to define starting param when players are outside frame
+- Improve algorithm when players disappear outside of frame
+- Figure out how to track players in background (combine colour tracking with edge detections(Harris/Tomasi, Lucas/Kanadi?) or Sift descriptors?)
+- Figure out how to stay on one player when occluded or when players cross (exemples: RedFront in vid5, GreenPlayers in vid3)
+- Find optimal parameters and starting position for every player/video (UPDATE README.md)
+
+- Calculate where the player's feet are (depends on what we track and the relative camera position)
+- Detect jumps (could use moveVec and add a jump after the highest peak has been reached)
+- Calculate player position during jumps
+- 
+Also, see TODOs in code

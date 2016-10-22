@@ -2,6 +2,17 @@ import cv2
 import numpy as np
 import Queue
 
+# Set global constants, see README.md for usage
+PATCHSIZE = 2
+GRADDIV = 10
+THRESHOLD = 7
+RAYRANGE = 30
+
+STARTPT_TH = 4
+NEWCENTRE_TH = 1.5
+TRAVERSE_TH = 2
+
+
 def MyConvolve(image, ff):
 	result = np.zeros(image.shape)
 	width = image.shape[0]
@@ -219,8 +230,9 @@ def rgbToBri(colour):
 
 	return bri
 
+# Return average BGR colours from 2*PATCHSIZE around indicated location
 def patchColour(image,indicatedLocation):
-	size = 2
+	size = PATCHSIZE
 	# Cropping out a window around the indicated component to find its colour	
 	sample = image[indicatedLocation[0]-size:indicatedLocation[0]+size,indicatedLocation[1]-size:indicatedLocation[1]+size]
 	greenAvg = np.mean(sample[:,:,0])
@@ -234,7 +246,6 @@ def singleColour(image, indicatedLocation):
 	G = image[indicatedLocation[0], indicatedLocation[1], 0]
 	B = image[indicatedLocation[0], indicatedLocation[1], 1]
 	R = image[indicatedLocation[0], indicatedLocation[1], 2]
-	#print [G, B, R]
 
 	return [G, B, R]
 
@@ -251,7 +262,7 @@ def rgbDistance(colour1,colour2):
 
 	return rgbDist
 
-# Convert rgb to Lab using RGB -> XYZ -> Lab
+# Convert RGB to Lab using RGB -> XYZ -> Lab
 def rgb2lab(rgb):
     	
 	## Convert RGB to XYZ
@@ -309,7 +320,7 @@ def rgb2lab(rgb):
 	return Lab
 
 
-# Calculate the difference between two Lab colors
+# Calculate the difference between two Lab colours, deltaE1976
 def deltaE(lab1, lab2):
 
 	L1, a1, b1 = lab1[0], lab1[1], lab1[2]
@@ -319,6 +330,7 @@ def deltaE(lab1, lab2):
 
 	return diff
 
+# Find distance between two Lab colours using deltaE
 def labDistance(colour1,colour2):
     # Convert BGR to RGB
 	col1 = np.zeros(3)
@@ -347,132 +359,19 @@ def findColourDistance(colour1,colour2):
 
 	return labDist
 
-# Find the nearest pixel that's a good match
-def findNewCentre(image, indicatedLocation, previousColour, startColour, threshold):
-	#sampleColour = previousColour
-	sampleColour = patchColour(image, indicatedLocation)
-	#sampleColour = singleColour(image, indicatedLocation)
+# Make starting colour a bit more similar to ending colour (factor 1/GradientDivide)
+# TODO: Change so this is done in Lab instead? Now it's only BGR
+def addGradient(startColour, endColour):
+	newStart = startColour
+	diff = np.zeros(3)
+	diff[0] = endColour[0] - startColour[0]
+	diff[1] = endColour[1] - startColour[1]
+	diff[2] = endColour[2] - startColour[2]
+	newStart = newStart + diff/GRADDIV
+	
+	return newStart
 
-	colourDistance = findColourDistance(sampleColour, previousColour)
-
-	rayRange = 25
-	startPtThreshold = 3*threshold
-	threshold = 2*threshold
-	startColour = previousColour
-	found = 0
-
-	# Rewrite completely?!?
-	#patch[]
-
-	print("Colour distance bad")
-	for i in range(1,rayRange):
-
-		# Make it into a for loop instead!?
-		# YES, but make it work first! :P
-
-		# Extend in 8 directions
-		nPatch = [indicatedLocation[0]-2*i,indicatedLocation[1]]
-		nePatch = [indicatedLocation[0]-2*i,indicatedLocation[1]+2*i]
-		ePatch = [indicatedLocation[0],indicatedLocation[1]+2*i]
-		sePatch = [indicatedLocation[0]+2*i,indicatedLocation[1]+2*i]
-		sPatch = [indicatedLocation[0]+2*i,indicatedLocation[1]]
-		swPatch = [indicatedLocation[0]+2*i,indicatedLocation[1]-2*i]
-		wPatch = [indicatedLocation[0],indicatedLocation[1]-2*i]
-		nwPatch = [indicatedLocation[0]-2*i,indicatedLocation[1]-2*i]
-
-		nPatchColour = patchColour(image, nPatch)
-		nePatchColour = patchColour(image, nePatch)
-		ePatchColour = patchColour(image, ePatch)
-		sePatchColour = patchColour(image, sePatch)
-		sPatchColour = patchColour(image, sPatch)
-		swPatchColour = patchColour(image, swPatch)
-		wPatchColour = patchColour(image, wPatch)
-		nwPatchColour = patchColour(image, nwPatch)
-
-		# Take new colour samples
-		#nPatchColour = singleColour(image, nPatch)
-		#nePatchColour = singleColour(image, nePatch)
-		#ePatchColour = singleColour(image, ePatch)
-		#sePatchColour = singleColour(image, sePatch)
-		#sPatchColour = singleColour(image, sPatch)
-		#swPatchColour = singleColour(image, swPatch)
-		#wPatchColour = singleColour(image, wPatch)
-		#nwPatchColour = singleColour(image, nwPatch)
-		
-		# Find distance to previous colour
-		nColourDistance = findColourDistance(nPatchColour,previousColour)
-		neColourDistance = findColourDistance(nePatchColour,previousColour)
-		eColourDistance = findColourDistance(ePatchColour,previousColour)
-		seColourDistance = findColourDistance(sePatchColour,previousColour)
-		sColourDistance = findColourDistance(sPatchColour,previousColour)
-		swColourDistance = findColourDistance(swPatchColour,previousColour)
-		wColourDistance = findColourDistance(wPatchColour,previousColour)
-		nwColourDistance = findColourDistance(nwPatchColour,previousColour)
-
-		# Find distance to starting colour
-		nStartColDist = findColourDistance(nPatchColour,startColour)
-		neStartColDist = findColourDistance(nePatchColour,startColour)
-		eStartColDist = findColourDistance(ePatchColour,startColour)
-		seStartColDist = findColourDistance(sePatchColour,startColour)
-		sStartColDist = findColourDistance(sPatchColour,startColour)
-		swStartColDist = findColourDistance(swPatchColour,startColour)
-		wStartColDist = findColourDistance(wPatchColour,startColour)
-		nwStartColDist = findColourDistance(nwPatchColour,startColour)
-
-		# Save only if it is below threshold for previous and starting colour and is best distance so far!
-		if nColourDistance < threshold and nStartColDist < startPtThreshold and nColourDistance < colourDistance:
-			colourDistance = nColourDistance
-			indicatedLocation = nPatch
-			found = 1
-		if neColourDistance < threshold and neStartColDist < startPtThreshold and neColourDistance < colourDistance:
-			colourDistance = neColourDistance
-			indicatedLocation = nePatch
-			found = 1
-		if eColourDistance < threshold and eStartColDist < startPtThreshold and eColourDistance < colourDistance:
-			colourDistance = eColourDistance
-			indicatedLocation = ePatch
-			found = 1
-		if seColourDistance < threshold and seStartColDist < startPtThreshold and seColourDistance < colourDistance:
-			colourDistance = seColourDistance
-			indicatedLocation = sePatch
-			found = 1
-		if sColourDistance < threshold and sStartColDist < startPtThreshold and sColourDistance < colourDistance:
-			colourDistance = sColourDistance
-			indicatedLocation = sPatch
-			found = 1
-		if swColourDistance < threshold and swStartColDist < startPtThreshold and swColourDistance < colourDistance:
-			colourDistance = swColourDistance
-			indicatedLocation = swPatch
-			found = 1
-		if wColourDistance < threshold and wStartColDist < startPtThreshold and wColourDistance < colourDistance:
-			colourDistance = wColourDistance
-			indicatedLocation = wPatch
-			found = 1
-		if nwColourDistance < threshold and nwStartColDist < startPtThreshold and nwColourDistance < colourDistance:
-			colourDistance = nwColourDistance
-			indicatedLocation = nwPatch
-			found = 1
-
-		# If we found something, return the best result
-		if(found == 1):
-			return indicatedLocation, found
-
-	# Nothing good were found
-	return indicatedLocation, found
-
-def findBottomest(image,notSameColour):
-	bottomestX = 0
-	bottomestY = 0
-
-	for i in range(image.shape[0]):
-		for j in range(image.shape[1]):
-			if notSameColour[i,j]: # Shouldnt this be the other way around?
-				if i > bottomestX:
-					bottomestX = i
-					bottomestY = j
-
-	return int(bottomestX), int(bottomestY)
-
+# Perform edge detection and return as boolean array
 def findCloseEdges(image, indicatedLocation):
 	region = image[indicatedLocation[0]-50:indicatedLocation[0]+50,indicatedLocation[1]-50:indicatedLocation[1]+50]
 	regionGray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
@@ -487,41 +386,119 @@ def findCloseEdges(image, indicatedLocation):
 	
 	return imageEdges
 
-def componentCoords(image, indicatedLocation, previousColour, startColour):
-	# Finding the average colour of the component
-	sampleColour = patchColour(image, indicatedLocation) # Do we want the average?
-	#sampleColour = image[indicatedLocation, :]
+# Find the nearest pixels that's a good match for previous colour
+def findNewCentre(image, indicatedLocation, previousColour, startColour, threshold):
 
-	# Calculating different measures of how different the previous and current colour patches are
+	sampleColour = patchColour(image, indicatedLocation)
+	#sampleColour = singleColour(image, indicatedLocation)
+
 	colourDistance = findColourDistance(sampleColour, previousColour)
 
-	# If the colour patches are very different - start looking for a new starting point
-	# Trying to find the point in the neighborhood that is more similar to the previous patch
-	threshold = 5
+	# Set up parameters
+	rayRange = RAYRANGE
+	startPtThreshold = STARTPT_TH*threshold
+	threshold = NEWCENTRE_TH*threshold
+	found = 0
 
-	visited = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
+	directions = 8
+	patch = np.zeros([directions, 2], int)
+	newPatchColour = np.zeros([directions, 3], np.uint8)
+	newColourDistance = np.zeros(directions)
+	startColDist = np.zeros(directions)
 
+	# TODO: Include edge detection somehow?
+	#regionEdges = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
+	#regionEdges = findCloseEdges(image, indicatedLocation)
+
+	print("Colour distance bad")
+	for i in range(1,rayRange):
+
+		# Extend in 8 directions
+		patch[0] = [indicatedLocation[0]-2*i,indicatedLocation[1]]
+		patch[1] = [indicatedLocation[0]-2*i,indicatedLocation[1]+2*i]
+		patch[2] = [indicatedLocation[0],indicatedLocation[1]+2*i]
+		patch[3] = [indicatedLocation[0]+2*i,indicatedLocation[1]+2*i]
+		patch[4] = [indicatedLocation[0]+2*i,indicatedLocation[1]]
+		patch[5] = [indicatedLocation[0]+2*i,indicatedLocation[1]-2*i]
+		patch[6] = [indicatedLocation[0],indicatedLocation[1]-2*i]
+		patch[7] = [indicatedLocation[0]-2*i,indicatedLocation[1]-2*i]
+
+		for i in range(directions):
+			# Take new colour sample
+			newPatchColour[i] = patchColour(image, patch[i])
+			#patchColour[i] = singleColour(image, patch[i])
+
+			# Find distance to previous colour
+			newColourDistance[i] = findColourDistance(newPatchColour[i],previousColour)
+
+			# Find distance to starting colour
+			startColDist[i] = findColourDistance(newPatchColour[i],startColour)
+
+			# Save only if it's below threshold for previous AND starting colour and if it's the best match so far!
+			if newColourDistance[i] < threshold and startColDist[i] < startPtThreshold and newColourDistance[i] < colourDistance:
+				colourDistance = newColourDistance[i]
+				indicatedLocation = patch[i]
+				found = 1
+
+		# If we found something this iteration, make starting colour a bit more similar and return the best result
+		if(found == 1):
+			endColour = patchColour(image, indicatedLocation)
+			startColour = addGradient(startColour, endColour)
+			return indicatedLocation, found, startColour
+
+	# Nothing good was found, return initial values
+	return indicatedLocation, found, startColour
+
+
+def findBottomest(image,notSameColour):
+	bottomestR = 0
+	bottomestC = 0
+
+	for i in range(image.shape[0]):
+		for j in range(image.shape[1]):
+			if notSameColour[i,j]:
+				if i > bottomestR:
+					bottomestR = i
+					bottomestC = j
+
+	return int(bottomestR), int(bottomestC)
+
+
+def componentCoords(image, indicatedLocation, previousColour, startColour):
+	# Finding the average colour of the component
+	sampleColour = patchColour(image, indicatedLocation)
+	#sampleColour = singleColour(image, indicatedLocation)
+
+	# Calculating how different the previous and current colour patches are
+	colourDistance = findColourDistance(sampleColour, previousColour)
+
+	# Constant for how different colours we should accept (Lab colour space)
+	threshold = THRESHOLD
+
+	# If the colour patches are very different - find a better match in surrounding
 	if colourDistance > threshold:
-    	# Returns the "best" value regardless, change so it only returns if we find something good?
-		indicatedLocation, found = findNewCentre(image, indicatedLocation, previousColour, startColour, threshold)
-		#If no new centre = we are lost => Stay put
+		indicatedLocation, found, startColour = findNewCentre(image, indicatedLocation, previousColour, startColour, threshold)
+		
 		if(found == 1):    		
 			print "Found new"
-			sampleColour = patchColour(image, indicatedLocation) # Do we want to sample here? Isn't it enough to take the colour, it's the best respons anyways...
+			sampleColour = patchColour(image, indicatedLocation)
 			#sampleColour = singleColour(image, indicatedLocation)
-		else:				
+		
+		else:	#If no new centre = we are lost => Stay put	
+			# TODO: handle player disappearence outside frame different? Move in direction of previous moveVec?
 			print "Nothing found"
-			# Return old values!? Search the border!?
 			centreR = indicatedLocation[0]
 			centreC = indicatedLocation[1]
 			bottomestR = indicatedLocation[0]
 			bottomestC = indicatedLocation[1]
+			visited = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
 			return centreR, centreC, bottomestR, bottomestC, visited, previousColour
 
 	# Finding the edges
 	imageEdges = findCloseEdges(image, indicatedLocation)
 
 	# Traversing
+	visited = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
 	toVisit = Queue.Queue()
 	notSameColour = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
 
@@ -546,20 +523,18 @@ def componentCoords(image, indicatedLocation, previousColour, startColour):
 	centreC = int(sumC/total)
 
 	return centreR, centreC, bottomestR, bottomestC, visited, sampleColour
-	
+
+# Traverse all pixels with similar colour
 def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges, threshold):
-	tolerance = 0.2
 
 	[i,j] = toVisit.get()
 
 	sameColour = True
 
-	#[sampleGreen, sampleRed, sampleBlue] = sampleColour
-	#[green, red, blue] = image[i,j]
 	currentColour = image[i,j]
 
-	# Comparing colour based on Euclidean distance
-	#threshold = 6
+	# Comparing colour based on Euclidean distance (deltaE1976, Lab colours)
+	threshold = threshold+TRAVERSE_TH
 	colourDistance = findColourDistance(sampleColour, currentColour)
 	sameColour = colourDistance < threshold
 
