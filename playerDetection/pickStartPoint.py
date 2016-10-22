@@ -14,7 +14,6 @@ def indicateLocation(image):
     rgbImage[:,:,0] = image[:,:,2]
     rgbImage[:,:,2] = image[:,:,0]
     rgbImage[:,:,1] = image[:,:,1]
-
     image = rgbImage
 
     #setting up a tkinter canvas with scrollbars
