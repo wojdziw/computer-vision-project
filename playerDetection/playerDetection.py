@@ -6,7 +6,7 @@ from annotationFunctions import *
 
 def playerDetection(videoNumber, indicatedLocation):
 
-	vidObj = cv2.VideoCapture('beach-volleyball-films/beachVolleyball'+str(videoNumber)+'.mov')
+	vidObj = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 
 	frameWidth = int(vidObj.get(cv2.CAP_PROP_FRAME_WIDTH))
 	frameHeight = int(vidObj.get(cv2.CAP_PROP_FRAME_HEIGHT))

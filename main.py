@@ -16,7 +16,7 @@ else:
 		print 'Usage: main.py <VideoIndex (int)>'
 
 # Read first frame for picking starting points
-video = cv2.VideoCapture('beach-volleyball-films/beachVolleyball'+str(videoNumber)+'.mov')
+video = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 _,image = video.read()
 #cv2.imwrite('vid'+str(videoNumber)+'.jpg', image)
 
