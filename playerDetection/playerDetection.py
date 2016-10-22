@@ -53,7 +53,7 @@ def playerDetection(videoNumber, indicatedLocation):
 		#jumps += 1
 
 		# Saving the frame to a jpg
-		#cv2.imwrite('playerDetection/individual-frames/frame' + str(fr) + '.jpg', image)
+		#cv2.imwrite('playerDetection/individualFrames/frame' + str(fr) + '.jpg', image)
 
 		# Saving the image frame
 		outObj.write(image)
