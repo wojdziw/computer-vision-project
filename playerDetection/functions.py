@@ -3,9 +3,9 @@ import numpy as np
 import Queue
 
 # Set global constants, see README.md for usage
-PATCHSIZE = 2
-GRADDIV = 30
-THRESHOLD = 6
+PATCHSIZE = 3
+GRADDIV = 10
+THRESHOLD = 7
 RAYRANGE = 30
 
 STARTPT_TH = 4

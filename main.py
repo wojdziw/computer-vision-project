@@ -37,7 +37,7 @@ player4Loc = [y,x]
 '''
 
 # Track players, returns foot position for every frame and total number of jumps
-player1positions, pl1jumps = playerDetection(videoNumber, player1Loc)
+player1positions = playerDetection(videoNumber, player1Loc)
 # player2positions = playerDetection(videoNumber, player2Loc)
 # player3positions = playerDetection(videoNumber, player3Loc)
 # player4positions = playerDetection(videoNumber, player4Loc)

@@ -17,7 +17,7 @@ def indicateLocation(image):
     image = rgbImage
 
     #setting up a tkinter canvas with scrollbars
-    frame = Frame(root, bd=2, relief=SUNKEN)
+    frame = Frame(root, bd=2, relief=SUNKEN, cursor="tcross")
     frame.grid_rowconfigure(0, weight=1)
     frame.grid_columnconfigure(0, weight=1)
     xscroll = Scrollbar(frame, orient=HORIZONTAL)

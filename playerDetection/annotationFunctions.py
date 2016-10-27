@@ -1,3 +1,5 @@
+import cv2
+
 def colourComponentBlack(image, visited):
 	for i in range(image.shape[0]):
 		for j in range(image.shape[1]):
