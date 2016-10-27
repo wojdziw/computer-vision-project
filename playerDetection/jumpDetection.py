@@ -136,4 +136,4 @@ def computeLongPeaks(array):
 playerPositions = np.load("positions.npy")
 jumps, noJumps = jumpDetection(playerPositions)
 playerPositions = recomputePositions(playerPositions, jumps)
-markPositions(3,playerPositions)
+markPositions(5,playerPositions)
