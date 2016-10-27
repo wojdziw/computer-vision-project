@@ -1,8 +1,11 @@
 
-Thoughts:
+(Adam) Thoughts:
 - Maybe we need to define the best starting position beforehand for every player/every video to get the best result. 
 At least for me (Adam) it's sometimes very hard to click on the correct pixel when choosing players in background. 
 However, there are a lot of parameters to be tweaked between every player for best result, so we probably can't do all in "one go" regardless.
+
+(Woj) Thoughts:
+- We should assume that we are *always* just looking at the shirt so that it's easier to extrapolate it to the legs. Could take the distance between centre and top as a reference.
 
 TODO for player detection:
 
@@ -17,3 +20,4 @@ TODO for player detection:
 - Calculate player position during jumps
 - 
 Also, see TODOs in code
+

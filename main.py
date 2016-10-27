@@ -3,6 +3,7 @@ import sys
 sys.path.append("playerDetection")
 from playerDetection import *
 from pickStartPoint import *
+import numpy as np
 
 ##########################################################################
 
@@ -41,3 +42,4 @@ player1positions, pl1jumps = playerDetection(videoNumber, player1Loc)
 # player3positions = playerDetection(videoNumber, player3Loc)
 # player4positions = playerDetection(videoNumber, player4Loc)
 
+np.save('playerDetection/positions.npy', player1positions)
