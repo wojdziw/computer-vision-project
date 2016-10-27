@@ -23,7 +23,6 @@ def playerDetection(videoNumber, indicatedLocation):
 	# Set up output
 	positions = np.zeros([frameCount, 2], int)
 	positions[0] = indicatedLocation # TODO: indicate bottom-most position here instead as well!?
-	jumps = 0
 
 	# Cropping out a window around the indicated component to find its BGR colour
 	startColour = patchColour(image, indicatedLocation)
@@ -48,10 +47,6 @@ def playerDetection(videoNumber, indicatedLocation):
 		image = colourComponentBlack(image, visited)
 		image = drawCrosses(image, centreR, centreC, bottomestR, bottomestC)
 
-		# TODO: Detect jump 
-		# Calc gradient from moveVec, when peak has been reached, jumps++
-		#jumps += 1
-
 		# Saving the frame to a jpg
 		#cv2.imwrite('playerDetection/individualFrames/frame' + str(fr) + '.jpg', image)
 
@@ -59,12 +54,12 @@ def playerDetection(videoNumber, indicatedLocation):
 		outObj.write(image)
 
 		# Saving new position
-		# TODO: Calculate position of feet! Take moveVec into account for jumps
+		# TODO: Calculate position of feet!
 		positions[fr] = [bottomestR, bottomestC] 
 		
 
 	vidObj.release()
 	outObj.release()
 
-	return positions, jumps
+	return positions
 

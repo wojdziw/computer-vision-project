@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from markPositions import *
+from annotationFunctions import *
 
 def recomputePositions(playerPositions, jumps):
 
@@ -136,4 +136,4 @@ def computeLongPeaks(array):
 playerPositions = np.load("positions.npy")
 jumps, noJumps = jumpDetection(playerPositions)
 playerPositions = recomputePositions(playerPositions, jumps)
-markPositions(2,playerPositions)
+markPositions(3,playerPositions)
