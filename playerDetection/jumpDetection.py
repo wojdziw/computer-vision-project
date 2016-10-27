@@ -17,7 +17,7 @@ def recomputePositions(playerPositions, jumps):
 
 	return playerPositions
 
-def jumpDetection(playerPositions):
+def jumpDetection(playerPositions,jumpLengthThreshold):
 
 	jumpFrames = np.zeros(playerPositions.shape[0], bool)
 
@@ -29,7 +29,7 @@ def jumpDetection(playerPositions):
 	derivatives = fakeDerivative(smoothedPositions[:,0],2)
 	smoothedDerivatives = smoothArray(derivatives, smoothingFilter)
 
-	peakLengths = computeLongPeaks(smoothedDerivatives)
+	peakLengths = computeLongPeaks(smoothedDerivatives,15,jumpLengthThreshold)	
 
 	for i, peakLength in enumerate(peakLengths):
 		if peakLength>0:
@@ -100,10 +100,9 @@ def gaussianFilter(stdev, extent):
 
 	return filter
 
-def computePeakLengths(array):
+def computePeakLengths(array, threshold):
 	lengths = np.zeros(len(array))
 
-	threshold = 2
 	thresholdedArray = [(0,i)[i > threshold] for i in array]
 
 	for i, point in enumerate(thresholdedArray):
@@ -116,11 +115,10 @@ def computePeakLengths(array):
 
 	return lengths
 
-def computeLongPeaks(array):
+def computeLongPeaks(array, lengthThreshold,jumpLengthThreshold):
 
-	lengths = computePeakLengths(array)
+	lengths = computePeakLengths(array, 2)
 
-	lengthThreshold = 15
 	lengths = [(0,i)[i > lengthThreshold] for i in lengths]
 
 	localMaxima = np.zeros(len(array))
@@ -131,9 +129,10 @@ def computeLongPeaks(array):
 		if lengths[i] == 0 and lengths[i-extent]>0 and lengths[i+extent]>0:
 			lengths[i-extent:i+extent+1] = np.full([2*extent+1], max(lengths[i-extent:i+extent+1]))
 
-	return lengths
+	# one more pass to account for filled gaps
+	lengths = computePeakLengths(lengths,0)
 
-playerPositions = np.load("positions.npy")
-jumps, noJumps = jumpDetection(playerPositions)
-playerPositions = recomputePositions(playerPositions, jumps)
-markPositions(5,playerPositions)
+	# and another to remove to short peaks
+	lengths = computePeakLengths(lengths,jumpLengthThreshold)
+
+	return lengths

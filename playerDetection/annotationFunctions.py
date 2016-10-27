@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 def colourComponentBlack(image, visited):
 	for i in range(image.shape[0]):
@@ -16,7 +17,7 @@ def drawCrosses(image, centreX, centreY, bottomestX, bottomestY):
 
 	return image
 
-def markPositions(videoNumber, positions):
+def markPositions(videoNumber, playerNumber, positions, jumps):
 
 	vidObj = cv2.VideoCapture('../beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 
@@ -27,14 +28,19 @@ def markPositions(videoNumber, positions):
 
 	# Define the codec and create VideoWriter object
 	fourcc = cv2.VideoWriter_fourcc(*'XVID')
-	outObj = cv2.VideoWriter('../output/positions' + str(videoNumber) + '.avi',fourcc, frameFPS, (frameWidth, frameHeight))
+	outObj = cv2.VideoWriter('../output/positions' + str(videoNumber) + "_" + str(playerNumber) + '.avi',fourcc, frameFPS, (frameWidth, frameHeight))
 
 	# Read first frame
 	_,image = vidObj.read()
 
+	words = cv2.imread("jumpWords.jpg")
+
 	for fr in range(1,frameCount):
 
 		_,image = vidObj.read()
+
+		if jumps[fr]:
+			image[0:100,0:150] = words
 
 		image = drawCrosses(image, positions[fr, 0], positions[fr, 1], 20,20)
 
