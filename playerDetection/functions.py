@@ -3,12 +3,12 @@ import numpy as np
 import Queue
 
 # Set global constants, see README.md for usage
-PATCHSIZE = 3
+PATCHSIZE = 2
 GRADDIV = 10
 THRESHOLD = 7
-RAYRANGE = 15
+RAYRANGE = 25
 
-STARTPT_TH = 6
+STARTPT_TH = 4
 NEWCENTRE_TH = 1.5
 TRAVERSE_TH = 2
 

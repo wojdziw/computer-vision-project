@@ -27,19 +27,9 @@ print(y, x)
 player1Loc = [y,x]
 #player1Loc = [69, 102] #Vid1: WhiteLeft
 #player1Loc = [60, 174] #Vid1, WhiteRight
-'''
-x, y = indicateLocation(image)
-player2Loc = [y,x]
-x, y = indicateLocation(image)
-player3Loc = [y,x]
-x, y = indicateLocation(image)
-player4Loc = [y,x]
-'''
+
 
 # Track players, returns foot position for every frame and total number of jumps
 player1positions = playerDetection(videoNumber, player1Loc)
-# player2positions = playerDetection(videoNumber, player2Loc)
-# player3positions = playerDetection(videoNumber, player3Loc)
-# player4positions = playerDetection(videoNumber, player4Loc)
 
-#np.save('positionArrays/positions2_1_bottoms.npy', player1positions)
+np.save('positionArrays/adam/positions' + str(videoNumber) +'_greenBack.npy', player1positions)
