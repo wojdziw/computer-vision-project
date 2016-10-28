@@ -571,3 +571,12 @@ def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges, thr
 
 	return i, j, visited, notSameColour, toVisit
 
+def calculateArea(visited):
+	area = 0
+
+	for i in range(visited.shape[0]):
+		for j in range(visited.shape[1]):
+			if visited[i,j]:
+				area += 1
+
+	return area

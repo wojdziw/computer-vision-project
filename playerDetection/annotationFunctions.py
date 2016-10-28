@@ -17,7 +17,7 @@ def drawCrosses(image, centreX, centreY, bottomestX, bottomestY):
 
 	return image
 
-def markPositions(videoNumber, playerNumber, positions, jumps):
+def markPositions(videoNumber, playerNumber, positions, jumps=np.zeros([1,1])):
 
 	vidObj = cv2.VideoCapture('../beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 
@@ -26,9 +26,15 @@ def markPositions(videoNumber, playerNumber, positions, jumps):
 	frameFPS = int(vidObj.get(cv2.CAP_PROP_FPS))
 	frameCount = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
 
+	name = "jumps"
+
+	if jumps.shape[0] == 1:
+		jumps = np.zeros(frameCount, bool)
+		name = "feet"
+
 	# Define the codec and create VideoWriter object
 	fourcc = cv2.VideoWriter_fourcc(*'XVID')
-	outObj = cv2.VideoWriter('../output/positions' + str(videoNumber) + "_" + str(playerNumber) + '.avi',fourcc, frameFPS, (frameWidth, frameHeight))
+	outObj = cv2.VideoWriter('../output/' + name + str(videoNumber) + "_" + str(playerNumber) + '.avi',fourcc, frameFPS, (frameWidth, frameHeight))
 
 	# Read first frame
 	_,image = vidObj.read()
