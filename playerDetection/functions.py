@@ -6,7 +6,7 @@ import Queue
 PATCHSIZE = 2
 GRADDIV = 10
 THRESHOLD = 7
-RAYRANGE = 30
+RAYRANGE = 25
 
 STARTPT_TH = 4
 NEWCENTRE_TH = 1.5
@@ -387,7 +387,10 @@ def findCloseEdges(image, indicatedLocation):
 	return imageEdges
 
 # Find the nearest pixels that's a good match for previous colour
-def findNewCentre(image, indicatedLocation, previousColour, startColour, threshold):
+def findNewCentre(image, indicatedLocation, previousColour, startColour, threshold, moveVec):
+
+	maxR = image.shape[0]
+	maxC = image.shape[1]
 
 	sampleColour = patchColour(image, indicatedLocation)
 	#sampleColour = singleColour(image, indicatedLocation)
@@ -400,19 +403,43 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 	threshold = NEWCENTRE_TH*threshold
 	found = 0
 
+	'''
 	directions = 8
 	patch = np.zeros([directions, 2], int)
 	newPatchColour = np.zeros([directions, 3], np.uint8)
 	newColourDistance = np.zeros(directions)
 	startColDist = np.zeros(directions)
+	'''
 
 	# TODO: Include edge detection somehow?
 	#regionEdges = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
 	#regionEdges = findCloseEdges(image, indicatedLocation)
 
+	# TODO: use moveVec!
+	# Start to look around in the direction we moved last
+	# indicatedLocation = indicatedLocation + moveVec/2
+
 	print("Colour distance bad")
 	for i in range(1,rayRange):
 
+		directions = (4*i-4)+(4*i)
+		#print( "Nr of directions ",  directions)
+
+		patch = np.zeros([directions, 2], int)
+		newPatchColour = np.zeros([directions, 3], np.uint8)
+		newColourDistance = np.zeros(directions)
+		startColDist = np.zeros(directions)
+
+		for j in range(2*i):
+			patch[j] = [indicatedLocation[0]-2*i,indicatedLocation[1]-(2*i)+(2*j)]
+			patch[j+(2*i)] = [indicatedLocation[0]+2*i,indicatedLocation[1]-(2*i)+(2*j)]
+
+		for k in range(2*i-2):
+			patch[k+(4*i)] = [indicatedLocation[0]-(2*i-2)+(2*k),indicatedLocation[1]-(2*i)]
+			patch[k+(2*i-2)+(4*i)] = [indicatedLocation[0]-(2*i-2)+(2*k),indicatedLocation[1]+(2*i)]
+
+		#print patch
+		'''		
 		# Extend in 8 directions
 		patch[0] = [indicatedLocation[0]-2*i,indicatedLocation[1]]
 		patch[1] = [indicatedLocation[0]-2*i,indicatedLocation[1]+2*i]
@@ -422,8 +449,18 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 		patch[5] = [indicatedLocation[0]+2*i,indicatedLocation[1]-2*i]
 		patch[6] = [indicatedLocation[0],indicatedLocation[1]-2*i]
 		patch[7] = [indicatedLocation[0]-2*i,indicatedLocation[1]-2*i]
-
+		'''
 		for i in range(directions):
+
+			if patch[i, 0] >= maxR-PATCHSIZE:
+				patch[i, 0] = maxR-1-PATCHSIZE
+			elif patch[i, 0] < 0+PATCHSIZE:
+				patch[i, 0] = 0+PATCHSIZE
+			if patch[i, 1] >= maxC-PATCHSIZE:
+				patch[i, 1] = maxC-1-PATCHSIZE
+			elif patch[i, 1] < 0+PATCHSIZE:
+				patch[i, 1] = 0+PATCHSIZE
+
 			# Take new colour sample
 			newPatchColour[i] = patchColour(image, patch[i])
 			#patchColour[i] = singleColour(image, patch[i])
@@ -464,7 +501,7 @@ def findBottomest(image,notSameColour):
 	return int(bottomestR), int(bottomestC)
 
 
-def componentCoords(image, indicatedLocation, previousColour, startColour):
+def componentCoords(image, indicatedLocation, previousColour, startColour, moveVec):
 	# Finding the average colour of the component
 	sampleColour = patchColour(image, indicatedLocation)
 	#sampleColour = singleColour(image, indicatedLocation)
@@ -477,7 +514,7 @@ def componentCoords(image, indicatedLocation, previousColour, startColour):
 
 	# If the colour patches are very different - find a better match in surrounding
 	if colourDistance > threshold:
-		indicatedLocation, found, startColour = findNewCentre(image, indicatedLocation, previousColour, startColour, threshold)
+		indicatedLocation, found, startColour = findNewCentre(image, indicatedLocation, previousColour, startColour, threshold, moveVec)
 		
 		if(found == 1):    		
 			print "Found new"

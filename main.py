@@ -42,4 +42,4 @@ player1positions = playerDetection(videoNumber, player1Loc)
 # player3positions = playerDetection(videoNumber, player3Loc)
 # player4positions = playerDetection(videoNumber, player4Loc)
 
-np.save('positionArrays/positions2_1_bottoms.npy', player1positions)
+#np.save('positionArrays/positions2_1_bottoms.npy', player1positions)

@@ -28,7 +28,7 @@ def playerDetection(videoNumber, indicatedLocation):
 	startColour = patchColour(image, indicatedLocation)
 	previousColour = startColour
 
-	moveVec = indicatedLocation
+	moveVec = [0, 0]
 
 	for fr in range(1,frameCount):
     	
@@ -37,8 +37,9 @@ def playerDetection(videoNumber, indicatedLocation):
 
 		# Finding the centre of the chosen component (e.g. leg, torso) and its bottom point
 		try:
-			centreR, centreC, bottomestR, bottomestC, visited, previousColour = componentCoords(image, indicatedLocation, previousColour, startColour)
-			moveVec = np.array(indicatedLocation) - np.array([centreR, centreC]) 
+			centreR, centreC, bottomestR, bottomestC, visited, previousColour = componentCoords(image, indicatedLocation, previousColour, startColour, moveVec)
+			moveVec = np.array([centreR, centreC]) - np.array(indicatedLocation) # Normalize?
+			# print "moveVec" + str(moveVec)
 			indicatedLocation = [centreR, centreC]
 		except:
 			print "Crash!"
@@ -54,7 +55,6 @@ def playerDetection(videoNumber, indicatedLocation):
 		outObj.write(image)
 
 		# Saving new position
-		# TODO: Calculate position of feet!
 		positions[fr] = [bottomestR, bottomestC] 
 		
 
