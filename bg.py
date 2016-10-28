@@ -155,7 +155,7 @@ def getHomographyMatrix(points1, points2):
 
 
 def main():
-	cap = cv2.VideoCapture("beachVolleyball2.mov")
+	cap = cv2.VideoCapture("beachVolleyball1.mov")
 
 	points1 = list()
 
