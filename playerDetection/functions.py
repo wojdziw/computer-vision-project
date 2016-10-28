@@ -3,12 +3,12 @@ import numpy as np
 import Queue
 
 # Set global constants, see README.md for usage
-PATCHSIZE = 2
+PATCHSIZE = 3
 GRADDIV = 10
 THRESHOLD = 7
-RAYRANGE = 25
+RAYRANGE = 30
 
-STARTPT_TH = 4
+STARTPT_TH = 6
 NEWCENTRE_TH = 1.5
 TRAVERSE_TH = 2
 
@@ -373,16 +373,29 @@ def addGradient(startColour, endColour):
 
 # Perform edge detection and return as boolean array
 def findCloseEdges(image, indicatedLocation):
-	region = image[indicatedLocation[0]-50:indicatedLocation[0]+50,indicatedLocation[1]-50:indicatedLocation[1]+50]
+	size = [50, 50, 50, 50]
+	threshold = 40
+	# Take care of boundaries so we doen't crash
+	if indicatedLocation[0]-size[0] < 0:
+		size[0] = indicatedLocation[0]
+	elif indicatedLocation[0]+size[1] >= image.shape[0]:
+		size[1] = image.shape[0]-indicatedLocation[0]
+
+	if indicatedLocation[1]-size[2] < 0:
+		size[2] = indicatedLocation[1]
+	elif indicatedLocation[1]+size[3] >= image.shape[1]:
+		size[3] = image.shape[0]-indicatedLocation[0]
+
+	region = image[indicatedLocation[0]-size[0]:indicatedLocation[0]+size[1],indicatedLocation[1]-size[2]:indicatedLocation[1]+size[3]]
 	regionGray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
 	regionEdges = sobel(regionGray)
-	regionEdges[regionEdges<40] = 0
-	regionEdges[regionEdges>=40] = 1
+	regionEdges[regionEdges<threshold] = 0
+	regionEdges[regionEdges>=threshold] = 1
 	
 	regionEdges.astype(bool)
 
 	imageEdges = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
-	imageEdges[indicatedLocation[0]-50:indicatedLocation[0]+50,indicatedLocation[1]-50:indicatedLocation[1]+50] = regionEdges
+	imageEdges[indicatedLocation[0]-size[0]:indicatedLocation[0]+size[1],indicatedLocation[1]-size[2]:indicatedLocation[1]+size[3]] = regionEdges
 	
 	return imageEdges
 
@@ -415,9 +428,8 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 	#regionEdges = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
 	#regionEdges = findCloseEdges(image, indicatedLocation)
 
-	# TODO: use moveVec!
 	# Start to look around in the direction we moved last
-	# indicatedLocation = indicatedLocation + moveVec/2
+	#indicatedLocation = indicatedLocation + moveVec/2
 
 	print("Colour distance bad")
 	for i in range(1,rayRange):
@@ -438,20 +450,9 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 			patch[k+(4*i)] = [indicatedLocation[0]-(2*i-2)+(2*k),indicatedLocation[1]-(2*i)]
 			patch[k+(2*i-2)+(4*i)] = [indicatedLocation[0]-(2*i-2)+(2*k),indicatedLocation[1]+(2*i)]
 
-		#print patch
-		'''		
-		# Extend in 8 directions
-		patch[0] = [indicatedLocation[0]-2*i,indicatedLocation[1]]
-		patch[1] = [indicatedLocation[0]-2*i,indicatedLocation[1]+2*i]
-		patch[2] = [indicatedLocation[0],indicatedLocation[1]+2*i]
-		patch[3] = [indicatedLocation[0]+2*i,indicatedLocation[1]+2*i]
-		patch[4] = [indicatedLocation[0]+2*i,indicatedLocation[1]]
-		patch[5] = [indicatedLocation[0]+2*i,indicatedLocation[1]-2*i]
-		patch[6] = [indicatedLocation[0],indicatedLocation[1]-2*i]
-		patch[7] = [indicatedLocation[0]-2*i,indicatedLocation[1]-2*i]
-		'''
-		for i in range(directions):
 
+		for i in range(directions):
+			# Take care so we don't exceed image dimensions
 			if patch[i, 0] >= maxR-PATCHSIZE:
 				patch[i, 0] = maxR-1-PATCHSIZE
 			elif patch[i, 0] < 0+PATCHSIZE:
