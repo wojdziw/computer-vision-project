@@ -6,7 +6,7 @@ import Queue
 PATCHSIZE = 3
 GRADDIV = 10
 THRESHOLD = 7
-RAYRANGE = 30
+RAYRANGE = 15
 
 STARTPT_TH = 6
 NEWCENTRE_TH = 1.5
@@ -416,13 +416,6 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 	threshold = NEWCENTRE_TH*threshold
 	found = 0
 
-	'''
-	directions = 8
-	patch = np.zeros([directions, 2], int)
-	newPatchColour = np.zeros([directions, 3], np.uint8)
-	newColourDistance = np.zeros(directions)
-	startColDist = np.zeros(directions)
-	'''
 
 	# TODO: Include edge detection somehow?
 	#regionEdges = np.zeros([image.shape[0], image.shape[1]], dtype=bool)
@@ -455,12 +448,12 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 			# Take care so we don't exceed image dimensions
 			if patch[i, 0] >= maxR-PATCHSIZE:
 				patch[i, 0] = maxR-1-PATCHSIZE
-			elif patch[i, 0] < 0+PATCHSIZE:
-				patch[i, 0] = 0+PATCHSIZE
+			elif patch[i, 0] < PATCHSIZE:
+				patch[i, 0] = PATCHSIZE
 			if patch[i, 1] >= maxC-PATCHSIZE:
 				patch[i, 1] = maxC-1-PATCHSIZE
-			elif patch[i, 1] < 0+PATCHSIZE:
-				patch[i, 1] = 0+PATCHSIZE
+			elif patch[i, 1] < PATCHSIZE:
+				patch[i, 1] = PATCHSIZE
 
 			# Take new colour sample
 			newPatchColour[i] = patchColour(image, patch[i])
@@ -559,6 +552,15 @@ def componentCoords(image, indicatedLocation, previousColour, startColour, moveV
 	# Centre of the component is assumed to be at the average of all of its coordinates
 	centreR = int(sumR/total)
 	centreC = int(sumC/total)
+	# More conditions!
+	if centreR < PATCHSIZE:
+		centreR = PATCHSIZE
+	elif centreR >= image.shape[0]:
+		centreR = image.shape[0]-PATCHSIZE-1
+	if centreC < PATCHSIZE:
+		centreC = PATCHSIZE
+	elif centreC >= image.shape[1]:
+		centreC = image.shape[1]-PATCHSIZE-1
 
 	return centreR, centreC, bottomestR, bottomestC, visited, sampleColour
 
