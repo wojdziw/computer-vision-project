@@ -1,5 +1,5 @@
 import cv2
-# import cv2.cv as cv
+import cv2.cv as cv
 import numpy as np
 import sys
 
@@ -49,10 +49,10 @@ def segmentMoving(bg, i_1, i_2, i_3, threshold, threshold_m):
 filename = sys.argv[1]
 cap = cv2.VideoCapture(filename)
 
-fps = int(cap.get(cv2.CAP_PROP_FPS))
-frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+fps = int(cap.get(cv.CV_CAP_PROP_FPS))
+frame_count = int(cap.get(cv.CV_CAP_PROP_FRAME_COUNT))
+frame_width = int(cap.get(cv.CV_CAP_PROP_FRAME_WIDTH))
+frame_height = int(cap.get(cv.CV_CAP_PROP_FRAME_HEIGHT))
 
 canny_lower = 0
 canny_upper = 0
