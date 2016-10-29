@@ -4,13 +4,13 @@ import Queue
 
 # Set global constants, see README.md for usage
 PATCHSIZE = 2
-GRADDIV = 8
-THRESHOLD = 7
+GRADDIV = 5
+THRESHOLD = 8
 RAYRANGE = 15
 
-STARTPT_TH = 5
+STARTPT_TH = 6
 NEWCENTRE_TH = 1.5
-TRAVERSE_TH = 5
+TRAVERSE_TH = 12
 
 
 def MyConvolve(image, ff):
@@ -390,7 +390,7 @@ def findCloseEdges(image, indicatedLocation):
 	regionGray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
 	regionEdges = sobel(regionGray)
 	regionEdges[regionEdges<threshold] = 0
-	regionEdges[regionEdges>=threshold] = 1
+	regionEdges[regionEdges>=threshold] = 0 # 1 Lets try this!
 	
 	regionEdges.astype(bool)
 
@@ -526,6 +526,7 @@ def componentCoords(image, indicatedLocation, previousColour, startColour, moveV
 			return centreR, centreC, bottomestR, bottomestC, visited, previousColour
 
 	# Finding the edges
+	# DEACTIVATED ATM, return all false!
 	imageEdges = findCloseEdges(image, indicatedLocation)
 
 	# Traversing
