@@ -4,7 +4,7 @@ from functions import *
 from annotationFunctions import *
 
 
-def playerDetection(videoNumber, indicatedLocation):
+def playerDetection(videoNumber, indicatedLocation, startFr):
 
 	vidObj = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 
@@ -18,7 +18,8 @@ def playerDetection(videoNumber, indicatedLocation):
 	outObj = cv2.VideoWriter('output/vid' + str(videoNumber) + '.avi',fourcc, frameFPS, (frameWidth, frameHeight))
 
 	# Read first frame
-	_,image = vidObj.read()
+	for i in range(startFr):
+		_,image = vidObj.read()
 
 	# Set up output
 	positions = np.zeros([frameCount, 2], int)
@@ -31,7 +32,7 @@ def playerDetection(videoNumber, indicatedLocation):
 
 	moveVec = [0, 0]
 
-	for fr in range(1,frameCount):
+	for fr in range(startFr,frameCount):
     	
 		print str(fr) + " out of " + str(frameCount)
 		_,image = vidObj.read()
@@ -50,7 +51,7 @@ def playerDetection(videoNumber, indicatedLocation):
 		image = drawCrosses(image, centreR, centreC, bottomestR, bottomestC)
 
 		# Saving the frame to a jpg
-		#cv2.imwrite('playerDetection/individualFrames/frame' + str(fr) + '.jpg', image)
+		cv2.imwrite('playerDetection/individualFrames/frame' + str(fr) + '.jpg', image)
 
 		# Saving the image frame
 		outObj.write(image)

@@ -16,10 +16,15 @@ else:
 	except:
 		print 'Usage: main.py <VideoIndex (int)>'
 
-# Read first frame for picking starting points
+startFr = 36
+
+# Read first frame players are seen for picking starting points
 video = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
-_,image = video.read()
-cv2.imwrite('vid'+str(videoNumber)+'.jpg', image)
+
+for i in range(startFr):
+	_,image = video.read()
+
+#cv2.imwrite('vid'+str(videoNumber)+'.jpg', image)
 
 # Let user pick tracking point for the 4 players 
 x, y = indicateLocation(image)
@@ -32,7 +37,7 @@ player1Loc = [y,x]
 
 
 # Track players, returns foot position for every frame and total number of jumps
-player1positions, areas = playerDetection(videoNumber, player1Loc)
+player1positions, areas = playerDetection(videoNumber, player1Loc, startFr)
 
 np.save('positionArrays/adam/positions' + str(videoNumber) +'_.npy', player1positions)
 np.save('positionArrays/adam/areas' + str(videoNumber) +'_.npy', areas)

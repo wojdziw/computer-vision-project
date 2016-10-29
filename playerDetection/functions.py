@@ -4,13 +4,13 @@ import Queue
 
 # Set global constants, see README.md for usage
 PATCHSIZE = 2
-GRADDIV = 30
-THRESHOLD = 6
-RAYRANGE = 30
+GRADDIV = 8
+THRESHOLD = 7
+RAYRANGE = 15
 
-STARTPT_TH = 4
+STARTPT_TH = 5
 NEWCENTRE_TH = 1.5
-TRAVERSE_TH = 2
+TRAVERSE_TH = 5
 
 
 def MyConvolve(image, ff):
