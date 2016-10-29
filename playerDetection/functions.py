@@ -4,9 +4,9 @@ import Queue
 
 # Set global constants, see README.md for usage
 PATCHSIZE = 2
-GRADDIV = 10
-THRESHOLD = 7
-RAYRANGE = 25
+GRADDIV = 30
+THRESHOLD = 6
+RAYRANGE = 30
 
 STARTPT_TH = 4
 NEWCENTRE_TH = 1.5
@@ -611,3 +611,13 @@ def traverseOut(image,sampleColour,visited,toVisit,notSameColour,imageEdges, thr
 
 	return i, j, visited, notSameColour, toVisit
 
+
+def calculateArea(visited):
+	area = 0
+
+	for i in range(visited.shape[0]):
+		for j in range(visited.shape[1]):
+			if visited[i,j]:
+				area += 1
+
+	return area

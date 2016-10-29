@@ -23,6 +23,7 @@ def playerDetection(videoNumber, indicatedLocation):
 	# Set up output
 	positions = np.zeros([frameCount, 2], int)
 	positions[0] = indicatedLocation # TODO: indicate bottom-most position here instead as well!?
+	areas = np.zeros(frameCount, int)
 
 	# Cropping out a window around the indicated component to find its BGR colour
 	startColour = patchColour(image, indicatedLocation)
@@ -56,10 +57,11 @@ def playerDetection(videoNumber, indicatedLocation):
 
 		# Saving new position
 		positions[fr] = [bottomestR, bottomestC] 
+		areas[fr] = calculateArea(visited)
 		
 
 	vidObj.release()
 	outObj.release()
 
-	return positions
+	return positions, areas
 
