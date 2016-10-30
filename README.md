@@ -7,11 +7,12 @@
 * (X) = disappears out of frame
 * (+) = gets occluded
 
-		track	(pSize, gradDiv, th, ray, st_th, nc_th, tr_th)		
+	
 #### Vid 1:
-| Player | What to track | pSize | gradDiv | th | ray | st-th | nc-th | tr-th | Status |
 
-|------------|:-------:|:---:|:----:|:---:|:---:|:---:|:---:|:---:|:------------:|
+| Player   | What to track   | pSize   | gradDiv   | th   | ray   | st-th   | nc-th   | tr-th   | Status   |
+
+| ------------ | :-------: | :---: | :----: | :---: | :---: | :---: | :---: | :---: | :------------: |
 
 | GreenFront | Shirt | 2 | 10 | 7 | 25 | 4 | 1.8 | 5 | Pos, area saved |
 
