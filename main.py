@@ -16,7 +16,7 @@ else:
 	except:
 		print 'Usage: main.py <VideoIndex (int)>'
 
-startFr = 215 # 1, 36, 72, 135, 215
+startFr = 106 # 1, 36, 72, 135, 215, 65, 106
 
 # Read first frame players are seen for picking starting points
 video = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')

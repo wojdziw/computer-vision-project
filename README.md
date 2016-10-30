@@ -33,21 +33,21 @@ WhiteRight	X+ Shorts 1, 10, 7, 15, 4, 1.5, 2		Pos, area saved
 
 #### Vid 5: 	
 RedFront	+Shirt(Fr215) 2, 5, 8, 15, 5, 2.0, 10		Pos, area saved
-RedBack		Shirt	2, 5, 8, 15, 5, 2.0, 10			Pos, area saved
+RedBack		Shirt	      2, 5, 8, 15, 5, 2.0, 10		Pos, area saved
 WhiteLeft	*
 WhiteRight	*+
 
 #### Vid 6: 	
-RedUp		*+ Shirt
-RedDown		* Shirt
-WhiteLeft	X Shoulder 2, 7, 7, 25, 5, 1.5, 2
-WhiteRight	Shoulder 2, 7, 7, 25, 5, 1.5, 2
+RedUp		*+Shirt(Fr65) 1, 10, 8, 10, 5, 1.5, 8		Pos, area saved
+RedDown		*Shirt(Fr65)  1, 10, 8, 10, 5, 1.5, 8		Pos, area saved (used bottemost instead of centre)
+WhiteLeft	XShoulder 2, 7, 7, 25, 5, 1.5, 2		Pos, area saved
+WhiteRight	Shoulder  2, 7, 7, 25, 5, 1.5, 2		Pos, area saved
 
 #### Vid 7: 	
-RedLeft		Shirt
-RedRight	X Shirt(Aim for the red!) 3, 10, 7, 25, 4, 1.5, 2 
-WhiteUp		*
-WhiteDown	*
+RedLeft		Shirt 1, 8, 8, 15, 4, 1.5, 4			Pos, area saved
+RedRight	XShirt 1, 8, 8, 15, 4, 1.5, 4 			Pos, area saved(use bottemost instead of centre)
+WhiteUp		*Shoulder(Fr106) 1, 8, 6, 15, 5, 1.5, 10	Pos, area saved
+WhiteDown	*Shoulder(Fr106)
 
 
 
