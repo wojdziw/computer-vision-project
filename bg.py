@@ -166,7 +166,7 @@ def main():
 	a , fstImg = cap.read()
 
 	for i in range(0, 4):
-		x, y =  0,0#pick.indicateLocation(fstImg)
+		x, y = 0,0 #pick.indicateLocation(fstImg)
 		points1.append([(float)(x),(float)(y)])
 
 	avgImg = np.float32(fstImg)
@@ -191,7 +191,7 @@ def main():
 		cv2.imshow("corners", np.array(out))
 		cv2.waitKey(30)
 
-		if(fr == frameCount - 1)	:
+		if(fr == frameCount - 50)	:
 				points2 = list()
 				proj = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
 
@@ -209,12 +209,11 @@ def main():
 				print(points1)
 				print(points2)
 
-
-				for i in range(img.shape[0]):
-					for j in range(img.shape[1]):
+				for i in range(proj.shape[0]):
+					for j in range(proj.shape[1]):
 						p = np.zeros((3,1))
-						p[0,0] = i
-						p[1,0] = j
+						p[0,0] = j
+						p[1,0] = i
 						p[2,0] = 1
 						pos = np.dot(h, p)
 						#print(pos)
@@ -222,8 +221,8 @@ def main():
 						px = (int)(pos[0,0]/pos[2,0])
 						py = (int)(pos[1,0]/pos[2,0])
 
-						if(px>=0 and py>=0 and px<img.shape[0] and py<img.shape[1]):
-							proj[i][j] = fstImg[px][py]
+						if(px>=0 and py>=0 and px<fstImg.shape[1] and py<fstImg.shape[0]):
+							proj[i][j] = fstImg[py][px]
 
 
 				
@@ -246,3 +245,5 @@ def main():
 
 if __name__ == '__main__':
 	main()
+
+				
