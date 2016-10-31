@@ -2,7 +2,7 @@ import numpy as np
 from jumpDetection import *
 from annotationFunctions import *
 
-def computeFeetLocations(centres, areas, initialDistance, imageHeight):
+def computeFeetLocations(centres, areas, initialDistance, imageHeight, constantExtrapolation=0):
 
 	feetLocations = centres
 
@@ -24,9 +24,12 @@ def computeFeetLocations(centres, areas, initialDistance, imageHeight):
 
 	for i, area in enumerate(areas):
 	
-		newDistance = initialDistance*(area/initialArea)
+		if constantExtrapolation>0:
+			newDistance = constantExtrapolation
+		else:
+			newDistance = initialDistance*(area/initialArea)
 
-		feetLocations[i,0] = min(centres[i,0]+50, imageHeight-1)
+		feetLocations[i,0] = min(centres[i,0]+newDistance, imageHeight-1)
 
 	return feetLocations
 
@@ -48,9 +51,9 @@ def medianFilter(array, extent):
 videoNumber = 2
 playerNumber = 1
 
-centres = np.load("../positionArrays/positions" + str(videoNumber) + "_" + str(playerNumber) + "_centres.npy")
-bottoms = np.load("../positionArrays/positions" + str(videoNumber) + "_" + str(playerNumber) + "_bottoms.npy")
-areas = np.load("../positionArrays/areas" + str(videoNumber) + "_" + str(playerNumber) + ".npy")
+centres = np.load("../positionArrays/feet/positions" + str(videoNumber) + "_" + str(playerNumber) + "_centres.npy")
+areas = np.load("../positionArrays/feet/areas" + str(videoNumber) + "_" + str(playerNumber) + ".npy")
+
 
 imageHeight = 296
 initialDistance = 130

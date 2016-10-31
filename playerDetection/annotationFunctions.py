@@ -26,11 +26,13 @@ def markPositions(videoNumber, playerNumber, positions, jumps=np.zeros([1,1])):
 	frameFPS = int(vidObj.get(cv2.CAP_PROP_FPS))
 	frameCount = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
 
-	name = "jumps"
-
+	name = ""
 	if jumps.shape[0] == 1:
+		# just initialise the jumps to be false
 		jumps = np.zeros(frameCount, bool)
 		name = "feet"
+	else:
+		name = "jumps"
 
 	# Define the codec and create VideoWriter object
 	fourcc = cv2.VideoWriter_fourcc(*'XVID')
