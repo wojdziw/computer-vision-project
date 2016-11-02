@@ -3,7 +3,7 @@ import cv2
 import cv2.cv as cv
 from collections import defaultdict
  
-cap = cv2.VideoCapture('../videos/beachVolleyball6.mov')
+cap = cv2.VideoCapture('../ballDetection/preprocessed/beachVolleyball3_2x_mo_mask.mov')
 
  
  # params for ShiTomasi corner detection
