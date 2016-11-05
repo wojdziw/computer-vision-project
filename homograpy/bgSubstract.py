@@ -26,14 +26,14 @@ fps = int(cap.get(cv.CV_CAP_PROP_FPS))
 frame_count = int(cap.get(cv.CV_CAP_PROP_FRAME_COUNT))
 frame_width = int(cap.get(cv.CV_CAP_PROP_FRAME_WIDTH))
 frame_height = int(cap.get(cv.CV_CAP_PROP_FRAME_HEIGHT))
-codec = int(cap.get(cv.CV_CAP_PROP_FOURCC))
+codec =  cv.CV_FOURCC('F', 'L', 'V', '1')
 bg = cv2.imread(background_file)
 frame_start = int(fps * seconds_start)
 
 noExt = filename[:filename.rfind('.')]
-out_filename = noExt + '_bg_substract_bg_at_' + str(seconds_start)
+out_filename = noExt + '_bg_substract_bg_at_' + str(seconds_start)+".avi"
 print "Output will be written to ", out_filename
-out = cv2.VideoWriter(out_filename, codec, fps, (frame_height * 3, frame_width))
+out = cv2.VideoWriter(out_filename, codec, 24, (frame_height*3, frame_width))
 
 
 paused = False
@@ -61,7 +61,9 @@ while(ret and frame_index < bl.shape[0]):
 
         frame = np.concatenate((frame, substracted, bgWarped), axis = 0)
         cv2.imshow('img', cv2.convertScaleAbs(frame))
-        out.write(cv2.convertScaleAbs(substracted))
+        resized_image = cv2.resize(cv2.convertScaleAbs(substracted), (frame_height*3, frame_width))
+        out.write(resized_image)
+
 
         prevPts = pts
         frame_index += 1
@@ -73,4 +75,5 @@ while(ret and frame_index < bl.shape[0]):
         break
 
 print "Done"
+out.release()
 cap.release()
