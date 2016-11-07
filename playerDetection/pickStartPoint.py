@@ -15,6 +15,7 @@ def indicateLocation(image):
     rgbImage[:,:,1] = image[:,:,1]
     rgbImage[:,:,2] = image[:,:,0]
     image = rgbImage
+    
 
     #setting up a tkinter canvas with scrollbars
     frame = Frame(root, bd=2, relief=SUNKEN, cursor="tcross")
@@ -45,7 +46,16 @@ def indicateLocation(image):
 
         root.destroy()
 
+    def rightclick(event):
+        global a
+        global b
+        a = -9999
+        b = -9999
+
+        root.destroy()
+
     canvas.bind("<Button 1>",printcoords)
+    canvas.bind("<Button 3>",rightclick)
 
     root.mainloop()
 

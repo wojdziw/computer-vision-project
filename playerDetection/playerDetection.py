@@ -42,8 +42,8 @@ def playerDetection(videoNumber, indicatedLocation, startFr):
 			centreR, centreC, bottomestR, bottomestC, visited, previousColour = componentCoords(image, indicatedLocation, previousColour, startColour, moveVec)
 			moveVec = np.array([centreR, centreC]) - np.array(indicatedLocation) # Normalize?
 			# print "moveVec" + str(moveVec)
-			#indicatedLocation = [centreR, centreC]
-			indicatedLocation = [bottomestR, bottomestC]
+			indicatedLocation = [centreR, centreC]
+			#indicatedLocation = [bottomestR, bottomestC]
 		except:
 			print "Crash!"
 
@@ -58,7 +58,7 @@ def playerDetection(videoNumber, indicatedLocation, startFr):
 		outObj.write(image)
 
 		# Saving new position
-		positions[fr] = [bottomestR, bottomestC] 
+		positions[fr] = [centreR, centreC] 
 		areas[fr] = calculateArea(visited)
 		
 

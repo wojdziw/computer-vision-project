@@ -60,7 +60,7 @@
 
 | Player | What to track | pSize | gradDiv | th | ray | st-th | nc-th | tr-th | Status | Track Bottom |
 |------------|:-------:|:---:|:----:|:---:|:---:|:---:|:---:|:---:|:------------:|:-----------:|
-| RedUp | (*+)Shirt(Fr65) | 1 | 10 | 8 | 10 | 5 | 1.5 | 8 | Pos, area saved | |
+| RedUp | (*+)Shirt(Fr79) | 1 | 10 | 7 | 10 | 5 | 1.5 | 5 | Pos, area saved | |
 | RedDown | (*)Shirt(Fr65) | 1 | 10 | 8 | 10 | 5 | 1.5 | 8 | Pos, area saved | Yes |
 | WhiteLeft | (X)Shoulder | 2 | 7 | 7 | 25 | 5 | 1.5 | 2 | Pos, area saved | |
 | WhiteRight | Shoulder | 2 | 7 | 7 | 25 | 5 | 1.5 | 2 | Pos, area saved | |

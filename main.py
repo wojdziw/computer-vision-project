@@ -16,7 +16,7 @@ else:
 	except:
 		print 'Usage: main.py <VideoIndex (int)>'
 
-startFr = 106 # 1, 36, 72, 135, 215, 65, 106
+startFr = 1 # 1, 36, 72, 135, 215, 65, 106
 
 # Read first frame players are seen for picking starting points
 video = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
@@ -32,7 +32,7 @@ print(y, x)
 player1Loc = [y,x]
 # Some players are hard to pick, use these coordinates in those cases
 #player1Loc = [69, 102] #Vid1: WhiteLeft
-#player1Loc = [60, 174] #Vid1, WhiteRight
+player1Loc = [60, 174] #Vid1, WhiteRight
 #player1Loc = [62, 394] #Vid2: WhiteLeft, [66,390]=shorts [62,394]=shirt [73,384]=leg
 #player1Loc = [75, 485] #Vid2, WhiteRight, [75,485]=shorts [76,481]=leg
 #player1Loc = [225, 8] # Vid3, GreenDown

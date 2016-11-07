@@ -4,13 +4,13 @@ import Queue
 
 # Set global constants, see README.md for usage
 PATCHSIZE = 1
-GRADDIV = 4
-THRESHOLD = 6
+GRADDIV = 10
+THRESHOLD = 5
 RAYRANGE = 8
 
 STARTPT_TH = 5
 NEWCENTRE_TH = 1.5
-TRAVERSE_TH = 10
+TRAVERSE_TH = 2
 
 
 def MyConvolve(image, ff):
@@ -370,6 +370,41 @@ def addGradient(startColour, endColour):
 	newStart = newStart + diff/GRADDIV
 	
 	return newStart
+
+# Performs horizontal edge detection and define it in regions of true and false 
+def modifiedEdgeDetection(image, indicatedLocation):
+	size = [50, 50, 50, 50]
+	threshold = 40
+
+	# Take care of boundaries so we doen't crash
+	if indicatedLocation[0]-size[0] < 0:
+		size[0] = indicatedLocation[0]
+	elif indicatedLocation[0]+size[1] >= image.shape[0]:
+		size[1] = image.shape[0]-indicatedLocation[0]
+
+	if indicatedLocation[1]-size[2] < 0:
+		size[2] = indicatedLocation[1]
+	elif indicatedLocation[1]+size[3] >= image.shape[1]:
+		size[3] = image.shape[0]-indicatedLocation[0]
+
+
+
+	region = image[indicatedLocation[0]-size[0]:indicatedLocation[0]+size[1],indicatedLocation[1]-size[2]:indicatedLocation[1]+size[3]]
+	regionGray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
+	
+	regionEdges = sobel_hor(regionGray)
+	
+	# TODO: Traverse from indicatedLoc out, 
+	# Start with true until first horizontal edges!
+	regionEdges[regionEdges<threshold] = 0
+	regionEdges[regionEdges>=threshold] = 255
+	
+	#regionEdges.astype(bool)
+
+	imageEdges = np.zeros([image.shape[0], image.shape[1]], np.unit8 )# dtype=bool)
+	imageEdges[indicatedLocation[0]-size[0]:indicatedLocation[0]+size[1],indicatedLocation[1]-size[2]:indicatedLocation[1]+size[3]] = regionEdges	
+
+	return imageEdges
 
 # Perform edge detection and return as boolean array
 def findCloseEdges(image, indicatedLocation):
