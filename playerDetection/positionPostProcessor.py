@@ -19,7 +19,7 @@ playerName = "greenBack"
 
 jumpLengthThreshold = 53
 
-playerPositions = np.load("../positionArrays/positions/positions" + str(videoNumber) + "_" + playerName + ".npy")
+playerPositions = np.load("../positionArrays/playerPos/positions" + str(videoNumber) + "_" + playerName + ".npy")
 
 # computing the jumps
 # jumps, noJumps = jumpDetection(playerPositions, jumpLengthThreshold)

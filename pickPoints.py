@@ -18,11 +18,6 @@ else:
 
 
 
-#vid2pts = np.load('./data/all_corners_video2.npy')
-#vid2pts = np.load('./data/all_corners_video3.npy')
-#vid2pts = np.load('./data/all_corners_video7.npy')
-
-#vid2pts = np.load('./positionArrays/homographyPts/pts_vid4.npy')
 ptsAll = np.load('./positionArrays/homographyPts/pts_vid' + str(videoNumber) + '_all.npy')
 #pts0 = np.load('./positionArrays/homographyPts/pts_vid4_0.npy')
 #pts1 = np.load('./positionArrays/homographyPts/pts_vid4_1.npy')
@@ -56,7 +51,7 @@ newHeight = frameHeight+200
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 outObj = cv2.VideoWriter('output/HomoPts_' + str(videoNumber) + '.avi',fourcc, frameFPS, (newWidth, newHeight))
 
-nrPts = 1 #ptsAll.shape[1] #vid2pts.shape[1] #10
+nrPts = 1 #ptsAll.shape[1] #10
 noPt = 0
 
 outPts = np.zeros([frameCount, nrPts, 2], int)
@@ -84,7 +79,7 @@ for fr in range(frameCount):
 
 		# Smooth the shit outa that!
 
-		if outPts[fr, pt, 0] > -95 : # and outPts[fr, pt, 0] < image.shape[0] and outPts[fr, pt, 1] > -10 and outPts[fr, pt, 1] < image.shape[1]:
+		if outPts[fr, pt, 0] > -95 : 
 			outImg[outPts[fr, pt, 0]+95:outPts[fr, pt, 0]+105,outPts[fr, pt, 1]+100]=[0,0,255]
 			outImg[outPts[fr, pt, 0]+100,outPts[fr, pt, 1]+95:outPts[fr, pt, 1]+105]=[0,0,255]
 		
