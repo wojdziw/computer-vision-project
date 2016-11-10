@@ -49,8 +49,8 @@ def indicateLocation(image):
     def rightclick(event):
         global a
         global b
-        a = -9999
-        b = -9999
+        a = -9899
+        b = -9899
 
         root.destroy()
 
