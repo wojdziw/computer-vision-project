@@ -10,7 +10,7 @@ RAYRANGE = 4
 
 STARTPT_TH = 5
 NEWCENTRE_TH = 1.5
-TRAVERSE_TH = 2
+TRAVERSE_TH = 10
 
 
 def MyConvolve(image, ff):

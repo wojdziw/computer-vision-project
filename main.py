@@ -45,3 +45,4 @@ player1positions, areas = playerDetection(videoNumber, player1Loc, startFr)
 
 np.save('positionArrays/adam/positions' + str(videoNumber) +'_.npy', player1positions)
 np.save('positionArrays/adam/areas' + str(videoNumber) +'_.npy', areas)
+

@@ -14,7 +14,7 @@ def markPositions(videoNumber, positions):
 
 	# Define the codec and create VideoWriter object
 	fourcc = cv2.VideoWriter_fourcc(*'XVID')
-	outObj = cv2.VideoWriter('../output/positions' + str(videoNumber) + '.avi',fourcc, frameFPS, (frameWidth, frameHeight))
+	outObj = cv2.VideoWriter('../output/feet' + str(videoNumber) + '.avi',fourcc, frameFPS, (frameWidth, frameHeight))
 
 	# Read first frame
 	_,image = vidObj.read()
