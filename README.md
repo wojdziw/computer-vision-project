@@ -1,5 +1,50 @@
 # CS4243 Computer Vision Project
 
+
+
+## How to run the scripts
+
+#### Player Tracking
+
+Run **_./main.py (VideoNumber)_** once for every player.
+ 
+Parameters at top of **_./playerDetection/functions.py_** needs to be changed accordingly to the table in *Appendix A* (below). If tracking needs to be started at a specific frame or pixel uncomment corresponding lines in **_./main.py_**
+
+Outputs to **_./data/area/_** and **_./data/playerPos/_**
+
+
+#### Feet Extraction and Jump Detection
+
+Player arrays are then used in **_./playerDetection/positionPostProcessor.py_**
+to calculate jumps and extrapolate feet positions
+
+Outputs to **_./data/rawFeetPositions/_** and **_./data/jumps/_**
+
+
+#### Smoothing arrays
+
+Feet arrays are smoothed by **_./other/smoothPlayers.py_**
+
+Outputs to **_./data/smoothFeetPostions/_**
+
+Arrays are then manually moved to **_./data/feetPositions/_** and renamed with new convention before being used for top-down homography.
+
+#### Points for homography
+
+
+#### Frame to Frame homography and stitching
+
+
+#### Ball detection and tracking
+
+
+#### Top-down homography
+
+
+#### Visualization
+
+
+## Appendix A
 ### Best parameters to track with (to date)
 
 ###### Explanations:
