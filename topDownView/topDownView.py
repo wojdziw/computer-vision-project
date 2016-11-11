@@ -148,7 +148,7 @@ for i in range(len(pointsFile)):
 
 	cv2.imshow("currPos",repres)
 	cv2.imshow("posFeet",frame)
-	cv2.waitKey(0)
+	cv2.waitKey(10)
 	p1.append(p1T)
 	p2.append(p2T)
 	p3.append(p3T)
