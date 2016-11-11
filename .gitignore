@@ -3,6 +3,7 @@ beachVolleyballFilms/
 output/
 playerDetection/individualFrames
 
+*.mov
 *.jpg
 *.pyc
 *.avi
