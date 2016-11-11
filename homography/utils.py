@@ -346,9 +346,9 @@ def getMinMaxWidthHeight(frame_width, frame_height, homographies):
     return uMinG, uMaxG, vMinG, vMaxG
 
 def getFilenamesForIndex(i):
-    points_file = 'data/points/video' + str(i) + '_points.npy'
-    source_video_filename = 'beachVolleyball/beachVolleyball' + str(i) + '.mov'
-    background_filename = 'beachVolleyball/video' + str(i) + '_background.jpg'
-    stitched_video_filename = 'data/stitched/stitching_' + str(i) + '.avi'
-    background_substracted_video_filename = 'beachVolleyball/video' + str(i) + '_background_substracted.avi'
+    points_file = '../data/points/video' + str(i) + '_points.npy'
+    source_video_filename = '../data/videos/beachVolleyball' + str(i) + '.mov'
+    background_filename = '../data/background' + str(i) + '_background.jpg'
+    stitched_video_filename = '../data/stitched/stitching_' + str(i) + '.avi'
+    background_substracted_video_filename = '../data/video' + str(i) + '_background_substracted.avi'
     return points_file, source_video_filename, background_filename, stitched_video_filename, background_substracted_video_filename

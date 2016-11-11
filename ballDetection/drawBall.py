@@ -26,7 +26,7 @@ def applyParabolicInterpolation(startPointComp, endPointComp, startPointInt, end
 	#	xs[i-startPointComp] = xs[i-startPointComp] - cumulX
 	#	ys[i-startPointComp] = ys[i-startPointComp] - cumulY
 
-	print(xs)
+	#print(xs)
 
 
 	sortedX = sorted(xs)
@@ -41,7 +41,7 @@ def applyParabolicInterpolation(startPointComp, endPointComp, startPointInt, end
 
 	#compute the parabolic curve
 	delta =  (end - start) / nb +1
-	print("delta "+ str(delta))
+	#print("delta "+ str(delta))
 	startX = start - (startPointComp-startPointInt)*delta
 	cumulX = 0
 	cumulY = 0
@@ -51,7 +51,7 @@ def applyParabolicInterpolation(startPointComp, endPointComp, startPointInt, end
 		x = startX + i*delta
 		r = applyPoly(res, x)
 		ec = startY - r
-		print(ec)
+		#print(ec)
 		final = r
 		#if(invert):
 		#	final = final + 2*ec
@@ -59,11 +59,11 @@ def applyParabolicInterpolation(startPointComp, endPointComp, startPointInt, end
 		curvX.append(x-cumulX)
 		curvY.append(final-cumulY)
 
-	print(res)
+	#print(res)
 
 	plt.scatter(curvX, curvY)            
 	plt.scatter(xs, ys)
-	plt.show()
+	#plt.show()
 #video 3 : 
 # compute para from 115 to 155 and apply from 88 to 169
 #video 1
@@ -99,8 +99,6 @@ if paraboles != None:
 ret, frame = cap.read()
 fourcc = cv.CV_FOURCC('F', 'L', 'V', '1')
 video = cv2.VideoWriter('../data/videos/balltrackEnhanced'+video+'.avi',fourcc,24,(frame.shape[1],frame.shape[0])) 
-print("sizes ")
-print(frame.shape)
 #play video
 for i in range(frCount-1):
 	ret, frame = cap.read()
@@ -112,8 +110,7 @@ for i in range(frCount-1):
 	#cv2.line(frame, (100,100),(100+(int)(x),100+(int)(y)), [255,0,0], 2)
 	video.write(frame)
 	cv2.imshow("frame", frame)
-	cv2.waitKey(10)
-	print(i)
+	cv2.waitKey(1)
 
 np.save(outputFile, ballPos)
 cap.release()

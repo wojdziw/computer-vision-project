@@ -115,7 +115,7 @@ if len(sys.argv)<2:
     sys.exit(0)
 video = sys.argv[1]
 videoFile = "../data/videos/beachVolleyball"+video+".mov"
-outputFile = "../data/ballPositions/ballPos"+video+"npy"
+outputFile = "../data/ballPositions/ballPos"+video+".npy"
 cap = cv2.VideoCapture(videoFile)
 
 frCount = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
@@ -201,8 +201,6 @@ ite = 0
 fourcc = cv.CV_FOURCC('F', 'L', 'V', '1')
 video = cv2.VideoWriter('balltrack.avi',fourcc,24,(old_gray.shape[1],old_gray.shape[0]))
 
-print("sizes ")
-print(old_gray.shape)
 for ite in range((int)(frCount) - 1):
     mask = np.zeros_like(old_frame)
     ret,frame = cap.read()

@@ -13,7 +13,7 @@ def main():
 
 	video = sys.argv[1]
 	cap = cv2.VideoCapture("../data/videos/balltrackEnhanced"+video+".avi")
-	stitching = cv2.VideoCapture("../data/stitched/stitching_"+video+".mp4")
+	stitching = cv2.VideoCapture("../data/stitched/stitching_"+video+".avi")
 	p1 = np.load("../data/topViewPlayers/video"+video+"_player1.npy")
 	p2 = np.load("../data/topViewPlayers/video"+video+"_player2.npy")
 	p3 = np.load("../data/topViewPlayers/video"+video+"_player3.npy")

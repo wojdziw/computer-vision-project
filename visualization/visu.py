@@ -44,7 +44,7 @@ class HorizontalLayout(View):
 
 	def draw(self, screen, rect):
 		childSize =  (rect.width )/ len(self.children)
-		print(str(childSize) + " horizontal size")
+		#print(str(childSize) + " horizontal size")
 		i = 0
 		for child in self.children:
 			r =  Rect(rect.x + i*childSize , rect.y, childSize - self.spacing, rect.height)
@@ -59,7 +59,7 @@ class VerticalLayout(View):
 
 	def draw(self, screen, rect):
 		childSize =  (rect.height )/ len(self.children)
-		print(str(childSize) + " vertical size")
+		#print(str(childSize) + " vertical size")
 		i = 0
 		for child in self.children:
 			r =  Rect(rect.x  , rect.y + i*childSize, rect.width , childSize - self.spacing)
@@ -98,12 +98,6 @@ class FieldView(View):
 		else:	
 			fieldDrawnWidth= (int)(rect.width * 1.0/fieldRatio)
 			fieldDrawnHeight= rect.height
-
-		print(rect.width)
-		print(rect.height)
-		print(fieldDrawnWidth)
-		print(fieldDrawnHeight)
-		print(fieldRatio)	
 
 		xFieldRatio = (float)(self.field.width) / fieldDrawnWidth
 		yFieldRatio = (float)(self.field.height) / fieldDrawnHeight

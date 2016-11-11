@@ -15,7 +15,7 @@ def getHomography(points, frame):
 	pT = list()
 
 	i = 0
-	print(points)
+	#print(points)
 	for i in range(6):
 		[x, y] = points[i]
 		if x>0 or y >0 and i<6:
