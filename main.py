@@ -24,7 +24,7 @@ else:
 startFr = 1 # 1, 36, 72, 135, 215, 65, 106
 
 # Read first frame players are seen for picking starting points
-video = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
+video = cv2.VideoCapture('./beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
 
 for i in range(startFr):
 	_,image = video.read()
@@ -48,7 +48,7 @@ player1Loc = [y,x]
 # Track players
 player1positions, areas = playerDetection(videoNumber, player1Loc, startFr)
 
-np.save('positionArrays/playerPos' + str(videoNumber) +'_.npy', player1positions)
-np.save('positionArrays/areas' + str(videoNumber) +'_.npy', areas)
+np.save('data/playerPos' + str(videoNumber) +'_.npy', player1positions)
+np.save('data/areas' + str(videoNumber) +'_.npy', areas)
 
 ##################################################################

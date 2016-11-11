@@ -19,18 +19,18 @@ else:
 
 
 
-ptsAll = np.load('../positionArrays/homographyPts/rawPts_vid' + str(videoNumber) + '_all.npy')
-#ptsAll = np.load('../positionArrays/homographyPts/video' + str(videoNumber) + '_points_raw.npy')
-#ptsAll = np.load('../positionArrays/homographyPts/video' + str(videoNumber) + '_points_smoothed.npy')
+ptsAll = np.load('../data/homographyPts/rawPts_vid' + str(videoNumber) + '_all.npy')
+#ptsAll = np.load('../data/homographyPts/video' + str(videoNumber) + '_points_raw.npy')
+#ptsAll = np.load('../data/homographyPts/video' + str(videoNumber) + '_points_smoothed.npy')
 
-#pts0 = np.load('../positionArrays/homographyPts/video2_points_0.npy')
-#pts1 = np.load('../positionArrays/homographyPts/video2_points_1.npy')
-#pts2 = np.load('../positionArrays/homographyPts/video2_points_2.npy')
-#pts3 = np.load('../positionArrays/homographyPts/video2_points_3.npy')
-#pts4 = np.load('../positionArrays/homographyPts/video2_points_4.npy')
-#pts5 = np.load('../positionArrays/homographyPts/video2_points_5.npy')
-#pts6 = np.load('../positionArrays/homographyPts/pts_vid4_6.npy')
-#pts7 = np.load('../positionArrays/homographyPts/pts_vid4_7.npy')
+#pts0 = np.load('../data/homographyPts/video2_points_0.npy')
+#pts1 = np.load('../data/homographyPts/video2_points_1.npy')
+#pts2 = np.load('../data/homographyPts/video2_points_2.npy')
+#pts3 = np.load('../data/homographyPts/video2_points_3.npy')
+#pts4 = np.load('../data/homographyPts/video2_points_4.npy')
+#pts5 = np.load('../data/homographyPts/video2_points_5.npy')
+#pts6 = np.load('../data/homographyPts/pts_vid4_6.npy')
+#pts7 = np.load('../data/homographyPts/pts_vid4_7.npy')
 
 
 
@@ -152,4 +152,4 @@ outObj.release()
 '''
 
 
-np.save('../positionArrays/homographyPts/video' + str(videoNumber) +'_points_.npy', outPts)
+np.save('../data/homographyPts/video' + str(videoNumber) +'_points_.npy', outPts)

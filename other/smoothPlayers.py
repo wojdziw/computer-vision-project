@@ -23,7 +23,7 @@ playerName = ["greenBack", "greenFront", "whiteRight", "whiteLeft"]
 
 for name in playerName:
 
-	pts = np.load('../positionArrays/feetPositions/feet'+str(videoNumber)+'_'+str(name)+'.npy')
+	pts = np.load('../data/rawFeetPositions/feet'+str(videoNumber)+'_'+str(name)+'.npy')
 	outPts = np.zeros(pts.shape)
 
 	#for fr in range(startFr):
@@ -45,4 +45,4 @@ for name in playerName:
 	plt.close()
 
 
-	np.save('../positionArrays/smoothFeetPos/feet' + str(videoNumber) +'_'+str(name)+'.npy', outPts)
+	np.save('../data/smoothFeetPos/feet' + str(videoNumber) +'_'+str(name)+'.npy', outPts)
