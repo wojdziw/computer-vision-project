@@ -7,7 +7,7 @@
 #### Player Tracking
 
 Run **_./main.py (VideoNumber)_** once for every player.
- 
+
 Parameters at top of **_./playerDetection/functions.py_** needs to be changed accordingly to the table in *Appendix A* (below). If tracking needs to be started at a specific frame or pixel uncomment corresponding lines in **_./main.py_**
 
 Outputs to **_./data/area/_** and **_./data/playerPos/_**
@@ -32,8 +32,19 @@ Arrays are then manually moved to **_./data/feetPositions/_** and renamed with n
 #### Points for homography
 
 
-#### Frame to Frame homography and stitching
+#### Frame to Frame homography, background extraction/substraction, stitching
 
+##### Do the following in this sequence:
+
+Run **_./homography/extractBackground.py <video_number> [visualize - 0 or 1, default is 0]_**
+to extract the background and save the resulting image in **_/beachVolleyball/_** - this might take a while
+
+[optional] Run **_./homography/substractBackground.py <video_number> [visualize - 0 or 1, default is 0]_**
+to produce a video with the background substracted from every frame. The resulting video
+is saved in **_/beachVolleyball/_**
+
+Run **_./homography/stitchVideo.py <video_number> [visualize - 0 or 1, default is 0]_**
+to produce a stitched video that will be saved to **_/data/stitched/_**
 
 #### Ball detection and tracking
 Run **_./ballDetection/ball_detection.py (VideoNumber)_**
@@ -55,19 +66,19 @@ This script requires the players feet and the homography points.
 Run **_./vizualisation/main.py_**
 , outputs final video in the same folder.
 
-This script requires the top-down homography player positions, player jumps, stitching videos, and ball tracking videos. 
+This script requires the top-down homography player positions, player jumps, stitching videos, and ball tracking videos.
 
 ## Appendix A
 ### Best parameters to track with (to date)
 
 ###### Explanations:
-* (*) = extra difficult to define start pos 
+* (*) = extra difficult to define start pos
 * (X) = disappears out of frame
 * (+) = gets occluded
 * ([row, column]) = what pixel to track
 * (FrXX) = which frame to start at
 
-	
+
 #### Vid 1:
 
 | Player | What to track | pSize | gradDiv | th | ray | st-th | nc-th | tr-th | Status |
@@ -78,7 +89,7 @@ This script requires the top-down homography player positions, player jumps, sti
 | WhiteRight | Shorts([60, 174]) | 1 | 10 | 5 | 8 | 5 | 1.5 | 2 | Pos, area saved |
 
 
-#### Vid 2: 
+#### Vid 2:
 
 | Player | What to track | pSize | gradDiv | th | ray | st-th | nc-th | tr-th | Status |
 |------------|:-------:|:---:|:----:|:---:|:---:|:---:|:---:|:---:|:------------:|
@@ -131,14 +142,3 @@ This script requires the top-down homography player positions, player jumps, sti
 | RedRight | (X)Shirt | 1 | 8 | 8 | 15 | 4 | 1.5 | 4 | Pos, area saved | Yes |
 | WhiteUp | (*)Shoulder(Fr106) | 1 | 8 | 6 | 15 | 5 | 1.5 | 10 | Pos, area saved | |
 | WhiteDown | (*)Shoulder(Fr106) | 1 | 4 | 6 | 8 | 5 | 1.5 | 10 | Pos, area saved | Yes |
-
-
-
-
-
-
-
-
-
-
-
