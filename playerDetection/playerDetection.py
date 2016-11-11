@@ -7,11 +7,15 @@ from annotationFunctions import *
 def playerDetection(videoNumber, indicatedLocation, startFr):
 
 	vidObj = cv2.VideoCapture('beachVolleyballFilms/beachVolleyball'+str(videoNumber)+'.mov')
+	subObj = cv2.VideoCapture('output/subtracted.avi')
 
 	frameWidth = int(vidObj.get(cv2.CAP_PROP_FRAME_WIDTH))
 	frameHeight = int(vidObj.get(cv2.CAP_PROP_FRAME_HEIGHT))
 	frameFPS = int(vidObj.get(cv2.CAP_PROP_FPS))
 	frameCount = int(vidObj.get(cv2.CAP_PROP_FRAME_COUNT))
+
+	frameCount2 = int(subObj.get(cv2.CAP_PROP_FRAME_COUNT))
+	print frameCount2
 
 	# Define the codec and create VideoWriter object
 	fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -36,10 +40,12 @@ def playerDetection(videoNumber, indicatedLocation, startFr):
     	
 		print str(fr) + " out of " + str(frameCount)
 		_,image = vidObj.read()
+		if fr < frameCount2:
+			_,subIm = subObj.read()
 
 		# Finding the centre of the chosen component (e.g. leg, torso) and its bottom point
 		try:
-			centreR, centreC, bottomestR, bottomestC, visited, previousColour = componentCoords(image, indicatedLocation, previousColour, startColour, moveVec)
+			centreR, centreC, bottomestR, bottomestC, visited, previousColour = componentCoords(image, indicatedLocation, previousColour, startColour, moveVec, subIm)
 			moveVec = np.array([centreR, centreC]) - np.array(indicatedLocation) # Normalize?
 			# print "moveVec" + str(moveVec)
 			indicatedLocation = [centreR, centreC]

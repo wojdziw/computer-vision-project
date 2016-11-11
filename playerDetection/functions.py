@@ -4,13 +4,14 @@ import Queue
 
 # Set global constants, see README.md for usage
 PATCHSIZE = 1
-GRADDIV = 10
-THRESHOLD = 5
-RAYRANGE = 4
+GRADDIV = 20
+THRESHOLD = 6
+RAYRANGE = 5
 
 STARTPT_TH = 5
-NEWCENTRE_TH = 1.5
-TRAVERSE_TH = 10
+NEWCENTRE_TH = 1.6
+TRAVERSE_TH = 1
+SUB_TH = 25
 
 
 def MyConvolve(image, ff):
@@ -435,7 +436,7 @@ def findCloseEdges(image, indicatedLocation):
 	return imageEdges
 
 # Find the nearest pixels that's a good match for previous colour
-def findNewCentre(image, indicatedLocation, previousColour, startColour, threshold, moveVec):
+def findNewCentre(image, indicatedLocation, previousColour, startColour, threshold, moveVec, subIm):
 
 	maxR = image.shape[0]
 	maxC = image.shape[1]
@@ -467,6 +468,8 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 
 		patch = np.zeros([directions, 2], int)
 		newPatchColour = np.zeros([directions, 3], np.uint8)
+		subColour = np.zeros([directions, 3], np.uint8)
+		subDistance = np.zeros(directions)
 		newColourDistance = np.zeros(directions)
 		startColDist = np.zeros(directions)
 
@@ -493,15 +496,17 @@ def findNewCentre(image, indicatedLocation, previousColour, startColour, thresho
 			# Take new colour sample
 			newPatchColour[i] = patchColour(image, patch[i])
 			#patchColour[i] = singleColour(image, patch[i])
+			subColour[i] = singleColour(subIm, patch[i])
+			subDistance[i] = findColourDistance(subColour[i],[0,0,0])
 
 			# Find distance to previous colour
 			newColourDistance[i] = findColourDistance(newPatchColour[i],previousColour)
 
 			# Find distance to starting colour
 			startColDist[i] = findColourDistance(newPatchColour[i],startColour)
-
+			
 			# Save only if it's below threshold for previous AND starting colour and if it's the best match so far!
-			if newColourDistance[i] < threshold and startColDist[i] < startPtThreshold and newColourDistance[i] < colourDistance:
+			if newColourDistance[i] < threshold and startColDist[i] < startPtThreshold and newColourDistance[i] < colourDistance and subDistance[i] > SUB_TH:
 				colourDistance = newColourDistance[i]
 				indicatedLocation = patch[i]
 				found = 1
@@ -530,7 +535,7 @@ def findBottomest(image,notSameColour):
 	return int(bottomestR), int(bottomestC)
 
 
-def componentCoords(image, indicatedLocation, previousColour, startColour, moveVec):
+def componentCoords(image, indicatedLocation, previousColour, startColour, moveVec, subIm):
 	# Finding the average colour of the component
 	sampleColour = patchColour(image, indicatedLocation)
 	#sampleColour = singleColour(image, indicatedLocation)
@@ -543,7 +548,7 @@ def componentCoords(image, indicatedLocation, previousColour, startColour, moveV
 
 	# If the colour patches are very different - find a better match in surrounding
 	if colourDistance > threshold:
-		indicatedLocation, found, startColour = findNewCentre(image, indicatedLocation, previousColour, startColour, threshold, moveVec)
+		indicatedLocation, found, startColour = findNewCentre(image, indicatedLocation, previousColour, startColour, threshold, moveVec, subIm)
 		
 		if(found == 1):    		
 			print "Found new"

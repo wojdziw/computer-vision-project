@@ -32,9 +32,9 @@ for i in range(startFr):
 #cv2.imwrite('vid'+str(videoNumber)+'.jpg', image)
 
 # Let user pick tracking point
-x, y = indicateLocation(image)
-print(y, x)
-player1Loc = [y,x]
+#x, y = indicateLocation(image)
+#print(y, x)
+#player1Loc = [y,x]
 # Some players are hard to pick, use these coordinates in those cases
 #player1Loc = [69, 102] #Vid1: WhiteLeft
 #player1Loc = [60, 174] #Vid1, WhiteRight
@@ -43,7 +43,8 @@ player1Loc = [y,x]
 #player1Loc = [225, 8] # Vid3, GreenDown
 #player1Loc = [189, 26] # Vid3, GreenUp
 #player1Loc = [162, 578] # Vid4, GreenUp
-#player1Loc = [130, 277] # Vid5, WhiteLeft
+player1Loc = [136, 286] # Vid5, WhiteLeft, leg=[136,286], shorts=[131,276], shoulder=[123,279]
+#player1Loc = [134, 346] # Vid5, WhiteRight, leg=[134,346], shorts=[131,336], shoulder=[122,340]
 
 # Track players
 player1positions, areas = playerDetection(videoNumber, player1Loc, startFr)
