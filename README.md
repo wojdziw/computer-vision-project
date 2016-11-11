@@ -36,13 +36,26 @@ Arrays are then manually moved to **_./data/feetPositions/_** and renamed with n
 
 
 #### Ball detection and tracking
+Run **_./ballDetection/ball_detection.py (VideoNumber)_**
+, outputs to **_./data/ballPos_**
 
+Then, Run **_./ballDetection/generateParaboles.py_**
+, outputs to **_./data/paraboles_**
+
+Finally run **_./ballDetection/drawBall.py_**
+, outputs videos to **_./data/videos_**
 
 #### Top-down homography
+Run **_./topDownView/topDownView.py_**,
+outputs : positions of players on a 1600x800 ground, to **_./data/topViewPlayers_**
 
+This scrypt requires the players feet and the homography points.
 
 #### Visualization
+Run **_./vizualisation/main.py_**
+, outputs final video in the same folder.
 
+This scrypt requires the top-down homography player positions, player jumps, stitching videos, and ball tracking videos. 
 
 ## Appendix A
 ### Best parameters to track with (to date)
