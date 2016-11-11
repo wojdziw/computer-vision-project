@@ -31,7 +31,7 @@ Arrays are then manually moved to **_./data/feetPositions/_** and renamed with n
 
 #### Points for homography
 
-** From this step the script processVideo.sh < video_number > can be used to generate the final video**
+**_From this step the script processVideo.sh < video_number > can be used to generate the final video_**
 #### Frame to Frame homography, background extraction/substraction, stitching
 
 ##### Do the following in this sequence:
