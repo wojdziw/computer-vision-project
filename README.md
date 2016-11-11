@@ -49,13 +49,13 @@ Finally run **_./ballDetection/drawBall.py_**
 Run **_./topDownView/topDownView.py_**,
 outputs : positions of players on a 1600x800 ground, to **_./data/topViewPlayers_**
 
-This scrypt requires the players feet and the homography points.
+This script requires the players feet and the homography points.
 
 #### Visualization
 Run **_./vizualisation/main.py_**
 , outputs final video in the same folder.
 
-This scrypt requires the top-down homography player positions, player jumps, stitching videos, and ball tracking videos. 
+This script requires the top-down homography player positions, player jumps, stitching videos, and ball tracking videos. 
 
 ## Appendix A
 ### Best parameters to track with (to date)
