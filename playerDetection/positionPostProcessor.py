@@ -19,21 +19,21 @@ playerName = "greenBack"
 
 jumpLengthThreshold = 53
 
-playerPositions = np.load("../positionArrays/playerPos/positions" + str(videoNumber) + "_" + playerName + ".npy")
+playerPositions = np.load("../data/playerPos/positions" + str(videoNumber) + "_" + playerName + ".npy")
 
 # computing the jumps
 # jumps, noJumps = jumpDetection(playerPositions, jumpLengthThreshold)
-# np.save("../positionArrays/jumps/jumps" + str(videoNumber) + "_" + playerName + ".npy", jumps)
+# np.save("../data/jumps/jumps" + str(videoNumber) + "_" + playerName + ".npy", jumps)
 
 # just loading the jumps from a file
-jumps = np.load("../positionArrays/jumps/jumps" + str(videoNumber) + "_" + playerName + ".npy")
-areas = np.load("../positionArrays/areas/areas" + str(videoNumber) + "_" + playerName + ".npy")
+jumps = np.load("../data/jumps/jumps" + str(videoNumber) + "_" + playerName + ".npy")
+areas = np.load("../data/areas/areas" + str(videoNumber) + "_" + playerName + ".npy")
 
 extrapolation = 50
 feetPositions = recomputePositions(playerPositions, jumps, extrapolation) #, areas) # uncomment if area scaling for extrapolation needed
 
 # uncomment if want to overwrite feet positions
-# np.save("../positionArrays/feetPositions/feet" + str(videoNumber) + "_" + playerName, feetPositions)
+# np.save("../data/rawFeetPositions/feet" + str(videoNumber) + "_" + playerName, feetPositions)
 
 markPositions(videoNumber,playerName,feetPositions,jumps)
 
