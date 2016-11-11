@@ -31,6 +31,16 @@ Arrays are then manually moved to **_./data/feetPositions/_** and renamed with n
 
 #### Points for homography
 
+Use the script **_.detectPoints.sh < video_number >_** to genererate the final set of points
+
+Outputs to **_./data/points/_**
+
+[optional] Run **_./pointsDetection/pointsDetection.py <video_number>_** to detect as much points sa possible. Outputs to **_./data/points/corners<video_number>.npy_**
+
+Run **_./pointsDetection/pointsSortingAndGuess.py <video_number>_** to sort the array of points previously detected and try to guess some others if there is less that 4 points for each frame. Outputs to **_.data/points/video_<video_number>_points.npy_**
+
+you can visualize any set of points by using **_.pointsDetection/showcorners.py <path_to_video> <path_to_points_numpy_array>_**.
+
 **_From this step the script processVideo.sh < video_number > can be used to generate the final video_**
 #### Frame to Frame homography, background extraction/substraction, stitching
 
