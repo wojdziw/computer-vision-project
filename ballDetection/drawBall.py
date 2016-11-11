@@ -68,18 +68,19 @@ def applyParabolicInterpolation(startPointComp, endPointComp, startPointInt, end
 # compute para from 115 to 155 and apply from 88 to 169
 #video 1
 
-if len(sys.argv)<4:
-    print("Usage : <VideoFile> <BallPosFile> <OutputFile> <ParaboleFile>")
+if len(sys.argv)<3:
+    print("Usage : <VideoNum> <Mask>")
     sys.exit(0)
 
-videoFile = sys.argv[1]
-ballPosFile = sys.argv[2]
-outputFile = sys.argv[3]
-paraboles = None
-if len(sys.argv)>4:
-	parabolFile = sys.argv[4]
-	paraboles = np.load(parabolFile)
-	maskLogo = (int)(sys.argv[5])
+video = sys.argv[1]
+videoFile = "../data/videos/beachVolleyball"+video+".mov"
+ballPosFile = "../data/ballPositions/ballPos"+video+".npy"
+outputFile = "../data/enhancedBallPos/enhanced"+video+".npy"
+
+
+parabolFile = "../data/paraboles/video"+video+"paraboles.npy"
+paraboles = np.load(parabolFile)
+maskLogo = (int)(sys.argv[2])
 
 ballPos = np.load(ballPosFile)
 ballPosOr = ballPos.copy()
@@ -97,7 +98,7 @@ if paraboles != None:
 
 ret, frame = cap.read()
 fourcc = cv.CV_FOURCC('F', 'L', 'V', '1')
-video = cv2.VideoWriter('../data/videos/balltrackEnhanced.avi',fourcc,24,(frame.shape[1],frame.shape[0])) 
+video = cv2.VideoWriter('../data/videos/balltrackEnhanced'+video+'.avi',fourcc,24,(frame.shape[1],frame.shape[0])) 
 print("sizes ")
 print(frame.shape)
 #play video

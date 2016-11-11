@@ -110,12 +110,12 @@ def indicateLocation(image):
 
 arguments = sys.argv
 
-if len(sys.argv)<3:
-    print("Usage : <VideoFile> <OutputFile>")
+if len(sys.argv)<2:
+    print("Usage : <Video num>")
     sys.exit(0)
-
-videoFile = sys.argv[1]
-outputFile = sys.argv[2]
+video = sys.argv[1]
+videoFile = "../data/videos/beachVolleyball"+video+".mov"
+outputFile = "../data/ballPositions/ballPos"+video+"npy"
 cap = cv2.VideoCapture(videoFile)
 
 frCount = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
