@@ -2,8 +2,8 @@
 beachVolleyballFilms/
 output/
 playerDetection/individualFrames
-data/
 
+*.mov
 *.jpg
 *.pyc
 *.avi
