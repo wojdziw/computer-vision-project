@@ -13,6 +13,7 @@ def main():
 
 	video = sys.argv[1]
 	cap = cv2.VideoCapture("../data/videos/balltrackEnhanced"+video+".avi")
+	stitching = cv2.VideoCapture("../data/stitched/stitching_"+video+".mp4")
 	p1 = np.load("../data/topViewPlayers/video"+video+"_player1.npy")
 	p2 = np.load("../data/topViewPlayers/video"+video+"_player2.npy")
 	p3 = np.load("../data/topViewPlayers/video"+video+"_player3.npy")
@@ -83,8 +84,9 @@ def main():
 		field  = v.Field(1600,800)
 
 		ret, image = cap.read()
+		ret, stitched = stitching.read()
 
-		visu = v.drawScreen(players, field, image, image)
+		visu = v.drawScreen(players, field, image, stitched)
 
 		video.write(visu)
 
@@ -93,6 +95,7 @@ def main():
 
 	cap.release()
 	video.release()
+	stitching.release()
 
 if __name__ == '__main__':
 	main()
