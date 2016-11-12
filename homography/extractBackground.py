@@ -9,6 +9,7 @@ if len(sys.argv) < 2:
     print "Usage: extractBackgound.py <video_number> [visualize - 0 or 1 - default -> 0] [seconds_start, default -> start of video] [seconds_ref, default -> seconds_start] [seconds_end, default -> end of video] "
     sys.exit(1)
 
+# Process command line arguments
 video_number = int(sys.argv[1])
 seconds_start = 0
 seconds_ref = 0
@@ -27,6 +28,7 @@ else:
 if len(sys.argv) > 5:
     seconds_end = float(sys.argv[5])
 
+# Get the filenames we need
 points_file, source_video_filename, background_filename, _, _ = getFilenamesForIndex(video_number)
 
 cap = cv2.VideoCapture(source_video_filename)
@@ -35,6 +37,8 @@ frame_count = int(cap.get(cv.CV_CAP_PROP_FRAME_COUNT))
 frame_width = int(cap.get(cv.CV_CAP_PROP_FRAME_WIDTH))
 frame_height = int(cap.get(cv.CV_CAP_PROP_FRAME_HEIGHT))
 
+# We want to know from which to which frame to start extracting and in which frame's
+# reference frame(hah) we should project
 frame_start = int(fps * seconds_start)
 frame_ref = int(fps * seconds_ref)
 frames_end = frame_count - 1
@@ -43,10 +47,14 @@ if seconds_end > 0:
 
 print 'Loading points, computing homographies...'
 points = np.load(points_file)
+# Remove noise
 points = smoothPointsArray(points)
-fbf = getFrameToFrameHomographies(points)
-homographies = generateHomographiesFromPoints(points, frame_ref, fbf)
+# Get frame-to-frame homographies(used in the next step)
+ftf = getFrameToFrameHomographies(points)
+# Get homographies w.r.t the reference frame
+homographies = generateHomographiesFromPoints(points, frame_ref, ftf)
 
+# Calculate the dimensions of the resulting image
 uMinG, uMaxG, vMinG, vMaxG = getMinMaxWidthHeight(frame_width, frame_height, homographies)
 max_width = uMaxG - uMinG
 max_height = vMaxG - vMinG
@@ -57,12 +65,15 @@ userQuit = False
 cap.set(cv.CV_CAP_PROP_POS_MSEC, 1000 * seconds_start)
 ret, firstFrame = cap.read()
 
+# We will accumulate the background in avgImg
 avgImg = np.zeros([max_height, max_width, 3], dtype='float')
 avgImg[-vMinG:frame_height - vMinG, -uMinG:frame_width - uMinG] = firstFrame
 
-sums_mask = np.zeros([max_height, max_width])
+# px_active_counts[x, y] -> in how many frames has x,y been in the bounds of the
+# warped frame
+px_active_counts = np.zeros([max_height, max_width])
 vis = np.float32(np.sum(avgImg, axis=2) != 0)
-sums_mask += vis
+px_active_counts += vis
 
 frame_index = frame_start
 frame_count = 1
@@ -74,6 +85,8 @@ while(ret and frame_index < frames_end and frame_index < homographies.shape[0]):
         if ret:
             # Get the homography induced by current frame and the reference one
             H = np.matrix(homographies[frame_index])
+            # We center our resulting image around the reference frame, so we
+            # need to translate the warped frame
             t = [-uMinG,-vMinG]
             Ht = np.matrix(([[1,0,t[0]],[0,1,t[1]],[0,0,1]]))
             # Warp the current frame with the homoraphy
@@ -85,26 +98,26 @@ while(ret and frame_index < frames_end and frame_index < homographies.shape[0]):
             # average
             vis = np.float32(np.sum(warpedFrame, axis=2) != 0)
             inv = np.float32(np.sum(warpedFrame, axis=2) == 0)
+            px_active_counts += vis
 
-            sums_mask += vis
-
-            mask = np.zeros([max_height, max_width, 3], dtype='float')
+            weights_mask = np.zeros([max_height, max_width, 3], dtype='float')
             black = np.zeros([max_height, max_width, 3])
-
-            mask[:,:,0] = np.array(sums_mask, dtype='float')
-            mask[:,:,1] = np.array(sums_mask, dtype='float')
-            mask[:,:,2] = np.array(sums_mask, dtype='float')
-            black[:,:,0] = np.array(inv)
-            black[:,:,1] = np.array(inv)
-            black[:,:,2] = np.array(inv)
+            for c in range(3):
+                weights_mask[:,:,c] = np.array(px_active_counts, dtype='float')
+                black[:,:,c] = np.array(inv)
 
             # Backgound averaging iteration
             prevAvg = np.array(avgImg)
             # Use the pixels from the previous iteration of averaging for the parts
             # of the frame which are not covered by the warped image
-            quot = 1.0 / mask
+            quot = 1.0 / weights_mask
             quot[quot == np.inf] = 0
+            # We weight each pixel in the warped frame by 1 over the number of
+            # times it has been a part of a warped frame so far - this is how
+            # we calculate the running average
             avgImg = (1 - quot) * avgImg + quot * warpedFrame
+            # We only add to the running average for the bounds of the current
+            # warped frames
             avgImg = black * prevAvg + (1 - black) * avgImg
 
             frame_index += 1
