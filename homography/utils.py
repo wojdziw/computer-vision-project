@@ -41,8 +41,8 @@ def computeNewPos(p, H):
     '''
     old_hc = np.matrix([p[0], p[1], 1]).T
     new_hc = np.matrix(H) * old_hc
-    u = round(new_hc[0,0])
-    v = round(new_hc[1,0])
+    u = round(new_hc[0,0] / float(new_hc[2, 0]))
+    v = round(new_hc[1,0] / float(new_hc[2, 0]))
     return np.array([u, v])
 
 def myWarpPerspective(img, H):
@@ -52,16 +52,10 @@ def myWarpPerspective(img, H):
         returns:
             new -> The image if img under H
     '''
-    tl = computeNewPos([0, 0], H)
-    tr = computeNewPos([img.shape[1] - 1, 0], H)
-    bl = computeNewPos([0, img.shape[0] - 1], H)
-    br = computeNewPos([img.shape[1] - 1, img.shape[0] - 1], H)
     new = np.zeros(img.shape)
-    covered = np.zeros([img.shape[0], img.shape[1]])
     H_inv = np.linalg.inv(H)
     for v in range(img.shape[0]):
         for u in range(img.shape[1]):
-            new[v, u] = [255, 255, 255]
             u_pre, v_pre = computeNewPos([u, v], H_inv)
             if 0 <= u_pre < img.shape[1] and 0 <= v_pre < img.shape[0]:
                 new[v, u] = img[v_pre, u_pre]
@@ -192,7 +186,6 @@ def getFrameToFrameHomographies(pts, MISSING = [-9999, -9999]):
     '''
     N, d, _ = pts.shape
     hom_arr = np.empty([N - 1, 3, 3]) # Holds the homographies between every two frames
-    refPoints = pts[0]
     for i in range(1, N):
     	curr = pts[i]
     	prev = pts[i - 1]
@@ -211,11 +204,8 @@ def getFrameToFrameHomographies(pts, MISSING = [-9999, -9999]):
     		hom_arr[i - 1] = np.matrix(getTransMatrix(np.array(prevActive), np.array(currActive)))
     	elif len(currActive) < 4:
     		hom_arr[i - 1] = np.matrix(getAffineMatrix(np.array(prevActive), np.array(currActive)))
-    	elif len(currActive) > 3:
+    	else: # len(currActive) > 3:
     		hom_arr[i - 1] = np.matrix(cv2.findHomography(np.array(currActive, dtype='float'), np.array(prevActive, dtype='float'))[0])
-    		refPoints = curr
-    	else:
-    		hom_arr[i - 1] = np.matrix(np.eye(3))
 
     return hom_arr
 
@@ -324,6 +314,7 @@ def getMinMaxWidthHeight(frame_width, frame_height, homographies):
         Get the minimum and maximum coordinates in the x and y direction
         that these homographies yield
     '''
+    # Create a matrix with the coordinates of the four corners
     posArray = np.array([[0, 0, 1], [frame_width, 0, 1], [0, frame_height, 1], [frame_width, frame_height, 1]]).T
     uMinG = 0
     uMaxG = frame_width
@@ -331,6 +322,7 @@ def getMinMaxWidthHeight(frame_width, frame_height, homographies):
     vMaxG = frame_height
     for i in range(homographies.shape[0]):
         H = homographies[i]
+        # Get the coordinates of the four corners in the warped frame
         newPoints = np.array(np.matrix(H) * np.matrix(posArray))
         newPoints[0, :] /= newPoints[2, :]
         newPoints[1, :] /= newPoints[2, :]
