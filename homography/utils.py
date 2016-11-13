@@ -35,6 +35,44 @@ def smooth(x,window_len=11,window='hanning'):
     y=numpy.convolve(w/w.sum(),s,mode='valid')
     return y
 
+
+def myFindHomography(points1, points2):
+    '''
+        Computes the homography induced by points1 and points2
+    '''
+    if len(points1) != len(points2):
+        raise ValueError("Argument vectors lengths must mach")
+    if len(points1) < 4:
+        raise ValueError("Cannot compute homography with less than 4 points")
+    if points1.shape != points2.shape:
+        raise ValueError("Arguments dimenstions mismatch: " + str(points1.shape) + " and " + str(points2.shape))
+    if points1.shape[0] not in [2,3] and points1.shape[1] not in [2,3]:
+        raise ValueError("One of the dimensions of the arguments should be 2 or 3")
+    p1 = np.array(points1)
+    p2 = np.array(points2)
+    if points1.shape[0] in [2,3]:
+        p1 = p1.T
+        p2 = p1.T
+    if(p1.shape[1] == 2):
+        p1 = np.concatenate((p1, np.ones([p1.shape[0], 1])), axis=1)
+        p2 = np.concatenate((p2, np.ones([p2.shape[0], 1])), axis=1)
+
+    n = len(points1)
+    A = np.zeros([3 * n, 9])
+    b = np.empty([3 * n, 1])
+    for i in range(n):
+        A[3 * i, 0:3] = p1[i]
+        A[3 * i + 1, 3:6] = p1[i]
+        A[3 * i + 2, 6:9] = p1[i]
+        b[3 * i:3 * i + 3] = np.reshape(p2[i], (3,1))
+
+    h, _, _, _ = np.linalg.lstsq(A, b)
+    H = np.empty([3, 3])
+    H[0] = h[0:3].T
+    H[1] = h[3:6].T
+    H[2] = h[6:9].T
+    return np.matrix(H), 1
+
 def computeNewPos(p, H):
     '''
         Compute the image of p under transformation with H
@@ -205,8 +243,7 @@ def getFrameToFrameHomographies(pts, MISSING = [-9999, -9999]):
     	elif len(currActive) < 4:
     		hom_arr[i - 1] = np.matrix(getAffineMatrix(np.array(prevActive), np.array(currActive)))
     	else: # len(currActive) > 3:
-    		hom_arr[i - 1] = np.matrix(cv2.findHomography(np.array(currActive, dtype='float'), np.array(prevActive, dtype='float'))[0])
-
+            hom_arr[i - 1] = np.matrix(cv2.findHomography(np.array(currActive, dtype='float'), np.array(prevActive, dtype='float'))[0])
     return hom_arr
 
 def generateHomographiesFromPoints(points, refIndex, frameByFrame, MISSING=-9999):
