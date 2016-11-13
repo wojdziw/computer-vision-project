@@ -1,6 +1,7 @@
 import numpy as np
 import numpy
 import cv2
+from math import ceil
 
 def smooth(x,window_len=11,window='hanning'):
     """smooth the data using a window with requested size.
@@ -79,8 +80,8 @@ def computeNewPos(p, H):
     '''
     old_hc = np.matrix([p[0], p[1], 1]).T
     new_hc = np.matrix(H) * old_hc
-    u = round(new_hc[0,0] / float(new_hc[2, 0]))
-    v = round(new_hc[1,0] / float(new_hc[2, 0]))
+    u = (new_hc[0,0] / float(new_hc[2, 0]))
+    v = (new_hc[1,0] / float(new_hc[2, 0]))
     return np.array([u, v])
 
 def myWarpPerspective(img, H):
@@ -95,8 +96,14 @@ def myWarpPerspective(img, H):
     for v in range(img.shape[0]):
         for u in range(img.shape[1]):
             u_pre, v_pre = computeNewPos([u, v], H_inv)
-            if 0 <= u_pre < img.shape[1] and 0 <= v_pre < img.shape[0]:
-                new[v, u] = img[v_pre, u_pre]
+            if 0 <= u_pre < img.shape[1] - 1 and 0 <= v_pre < img.shape[0] - 1:
+                a = u_pre - int(u_pre)
+                b = v_pre - int(v_pre)
+                one = img[int(v_pre), int(u_pre)]
+                two = img[int(v_pre), int(ceil(u_pre))]
+                three = img[int(ceil(v_pre)), int(u_pre)]
+                four = img[int(ceil(v_pre)), int(ceil(u_pre))]
+                new[v, u] = bilinearInterpolation(a, b, one, two, three, four)
     return new
 
 
@@ -373,6 +380,9 @@ def getMinMaxWidthHeight(frame_width, frame_height, homographies):
     vMinG = max(-frame_height, vMinG)
     vMaxG = min(2 * frame_height, vMaxG)
     return uMinG, uMaxG, vMinG, vMaxG
+
+def bilinearInterpolation(a, b, one, two, three, four):
+    return (1 - a) * (1 - b) * one + a * (1 - b) * two + (1 - a) * b * three + a * b * four
 
 def getFilenamesForIndex(i):
     points_file = '../data/points/video' + str(i) + '_points.npy'
